@@ -1,3 +1,3 @@
 # NeuroBGE
 ![NeuroBGE Logo](images/logo.png)
-A neural node-based Blender game engine and logic editor addon for Blender
+## A neural node-based Blender game engine and logic editor addon for Blender
