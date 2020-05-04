@@ -7,6 +7,7 @@
 Create games using a node-based logic editor and other incorporated features and functionalities
 ## Installation
 Clone or download this repository and install the addon in Blender with `Preferences > Addons > Install` and enable the addon.
+[Download](https://github.com/underpig1/neuro-bge/archive/master.zip)
 ## Functionalities
 - Logic editor
 - Scripting capabilities
