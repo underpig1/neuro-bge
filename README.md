@@ -4,4 +4,8 @@
 ![NeuroBGE Storefront](images/untitled.png)
 ## Installation
 Clone or download this repository and install the addon in Blender with `Preferences > Addons > Install` and enable the addon.
-## Use
+## Functionalities
+- Logic Editor
+- Scripting capabilities
+- Game engine
+- Build functions for supported platforms (Mac OSX; Windows; Linux)
