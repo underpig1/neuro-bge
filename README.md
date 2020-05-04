@@ -24,7 +24,15 @@ Build your game with the build functionality. Press build in either menu, and se
 
 [SH to APP for Mac OSX and Linux](https://gist.github.com/mathiasbynens/674099)
 ## Use
-#### *Keymap*
+#### *Keymap and Interface*
+The node utility menu can be found in the Logic Editor interface, and includes such functions as Assign Script and Run. The menu found in the header of the Viewport can be triggered by pressing E while in Object Mode.
+Functionality | Operation
+------------ | -------------
+Assign Script | The selected object is assigned to the selected node. This can be useful if you would like a node to apply only to a certain object. All Output nodes require an assigned object. Found in the node utility menu.
+Run | Runs all.
+Stop | Stops all.
+Build | Builds game.
+Create Variable | Creates a variable, used in the Logic nodes: Set Variable and Variable. Found in the node utility menu.
 #### *Events*
 #### *Controllers*
 ## TODO
