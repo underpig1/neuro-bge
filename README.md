@@ -31,7 +31,7 @@ Functionality | Operation
 Assign Script | The selected object is assigned to the selected node. This can be useful if you would like a node to apply only to a certain object. All Output nodes require an assigned object. Found in the node utility menu.
 Run | Runs all.
 Stop | Stops all.
-Build | Builds game.
+Build | [Builds](https://github.com/underpig1/neuro-bge#build) game to selected platform.
 Create Variable | Creates a variable, used in the Logic nodes: Set Variable and Variable. Found in the node utility menu.
 #### *Events*
 #### *Controllers*
