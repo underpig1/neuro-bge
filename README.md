@@ -14,7 +14,9 @@ Clone or download this repository and install the addon in Blender with `Prefere
 - Build functions for supported platforms (Mac OSX*; Windows; Linux*)
 - Over forty-five nodes to develop stable games
 ## Build
-*Notice:* to build on Blender
+***Notice:*** *building in Blender 2.8 requires Python 3.8 to be installed*
+## Use
+***Notice:*** *building in Blender 2.8 requires Python 3.8 to be installed*
 ## TODO
 - [x] Build support
 - [x] XR support
