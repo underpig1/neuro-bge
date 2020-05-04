@@ -1,7 +1,6 @@
 # NeuroBGE
 ![NeuroBGE Storefront](images/storefront.png)
 #### A node-based Blender game engine and logic editor addon for Blender
-Create games using a node-based logic editor and other incorporated features and functionalities
 ##
 ![NeuroBGE Example](images/untitled.png)
 ##
