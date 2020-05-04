@@ -19,7 +19,7 @@ Clone or download this repository and install the addon in Blender with `Prefere
 ***Notice:*** *building in Blender 2.8 requires Python 3.8 to be installed*
 ## TODO
 - [x] Build support
-- [x] XR support
-  - [x] XR build support
+- [ ] XR support
+  - [ ] XR build support
 
 *Untested
