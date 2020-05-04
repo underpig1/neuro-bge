@@ -15,8 +15,18 @@ Clone or download this repository and install the addon in Blender with `Prefere
 - Over forty-five nodes to develop stable games
 ## Build
 ***Notice:*** *building in Blender 2.8 requires Python 3.8 to be installed*
+
+Build your game with the build functionality. Press build in either menu, and select your platform and directory to build your game. The game will become a shell script or executable.
+
+*Building for Linux returns a SH file, which is suitable for both Mac OSX and Linux, if desirable.*
+
+[BAT to EXE for Windows](https://superuser.com/questions/868340/how-can-i-convert-a-windows-batch-script-to-a-exe)
+
+[SH to APP for Mac OSX and Linux](https://gist.github.com/mathiasbynens/674099)
 ## Use
-***Notice:*** *building in Blender 2.8 requires Python 3.8 to be installed*
+#### *Keymap*
+#### *Events*
+#### *Controllers*
 ## TODO
 - [x] Build support
 - [ ] XR support
