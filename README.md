@@ -44,5 +44,6 @@ Create Variable | Creates a variable, used in the Logic nodes: Set Variable and 
   - [ ] XR build support
 - [ ] Tablet input
 - [ ] Run operations
+- [ ] Spawn entity
 
 *Untested
