@@ -42,5 +42,7 @@ Create Variable | Creates a variable, used in the Logic nodes: Set Variable and 
 - [x] Build support
 - [ ] XR support
   - [ ] XR build support
+- [ ] Tablet input
+- [ ] Run operations
 
 *Untested
