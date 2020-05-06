@@ -46,5 +46,6 @@ Create Variable | Creates a variable, used in the Logic nodes: Set Variable and 
 - [ ] Run operations
 - [ ] Spawn entity
 - [ ] Rigidbody World
+- [ ] Navigation agent
 
 *Untested
