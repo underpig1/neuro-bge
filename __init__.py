@@ -9,6 +9,7 @@ bl_info = {
     "category": "Object",
 }
 
+import bpy
 import neurobge
 
 def register():
