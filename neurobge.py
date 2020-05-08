@@ -1,4 +1,3 @@
-import bpy
 import nodeitems_utils
 import mathutils
 import functools
