@@ -1235,18 +1235,18 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     def build(self, context):
         if int(self.platform) == 1:
             file = open(self.filepath + ".bat", "w", encoding = "utf-8")
-            file.write("ECHO ON\nREM Execute build file\nSET PATH=%PATH%;C:\\Python38\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python build.py")
+            file.write("ECHO ON\nREM Execute build file\nSET PATH=%PATH%;C:\\Python38\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python " + os.path.dirname(os.path.realpath(__file__))[:-11] + "build.py")
             file.close()
         elif int(self.platform) == 2:
             import os
             file = open(self.filepath + ".command", "w", encoding = "utf-8")
-            file.write("#!/bin/bash\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python build.py")
+            file.write("#!/bin/bash\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python " + os.path.dirname(os.path.realpath(__file__))[:-11] + "build.py")
             file.close()
             os.system("chmod +x " + self.filepath + ".command")
         elif int(self.platform) == 3:
             import os
             file = open(self.filepath + ".sh", "w", encoding = "utf-8")
-            file.write("#!/bin/bash\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python build.py")
+            file.write("#!/bin/bash\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python " + os.path.dirname(os.path.realpath(__file__))[:-11] + "build.py")
             file.close()
             os.system("chmod +x " + self.filepath + ".sh")
         elif int(self.platform) == 4:
