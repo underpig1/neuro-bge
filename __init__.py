@@ -10,7 +10,7 @@ bl_info = {
 }
 
 import bpy
-import neurobge
+from . import neurobge
 
 def register():
     neurobge.register()
