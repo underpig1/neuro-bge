@@ -257,7 +257,7 @@ class MathInput(InputNode):
     nodeType = "InputNode"
     operator = bpy.props.EnumProperty(
         name = "Operator",
-        items = (("1", "Add", "Addition operator"), ("2", "Subtract", "Subtraction operator"), ("3", "Multiply", "Multiplication operator"), ("4", "Divide", "Division operator"), ("5", "Min", "Minimum operator"), ("6", "Max", "Maximum operator"), ("7", "Power", "Exponent operator"), ("8", "Modulo", "Modulo operator"))
+        items = (("1", "Add", "Addition operator"), ("2", "Subtract", "Subtraction operator"), ("3", "Multiply", "Multiplication operator"), ("4", "Divide", "Division operator"), ("5", "Min", "Minimum operator"), ("6", "Max", "Maximum operator"), ("7", "Power", "Exponent operator"), ("8", "Modulo", "Modulo operator"), ("9", "Square Root", "Square root operator"), ("10", "Root", "Root operator"), ("11", "Cosine", "Cosine operator"), ("12", "Sine", "Sine operator"), ("13", "Tangent", "Tangent operator"), ("14", "Floor", "Floor operator"), ("15", "Ceiling", "Ceiling operator"), ("16", "Round", "Round operator"), ("17", "Arc Cosine", "Arc cosine operator"), ("18", "Arc Sine", "Arc sine operator"), ("19", "Arc Tangent", "Arc tangent operator"), ("20", "Remainder", "Remainder operator"))
     )
 
     def init(self, context):
@@ -287,6 +287,30 @@ class MathInput(InputNode):
             self.outputs[0].default_value = values[0] ** values[1]
         elif int(self.operator) == 8:
             self.outputs[0].default_value = values[0] % values[1]
+        elif int(self.operator) == 9:
+            self.outputs[0].default_value = math.sqrt(values[0])
+        elif int(self.operator) == 10:
+            self.outputs[0].default_value = values[0] ** (1.0/values[1])
+        elif int(self.operator) == 11:
+            self.outputs[0].default_value = math.cos(values[0])
+        elif int(self.operator) == 12:
+            self.outputs[0].default_value = math.sin(values[0])
+        elif int(self.operator) == 13:
+            self.outputs[0].default_value = math.tan(values[0])
+        elif int(self.operator) == 14:
+            self.outputs[0].default_value = float(math.floor(values[0]))
+        elif int(self.operator) == 15:
+            self.outputs[0].default_value = float(math.ceil(values[0]))
+        elif int(self.operator) == 16:
+            self.outputs[0].default_value = float(math.round(values[0]))
+        elif int(self.operator) == 17:
+            self.outputs[0].default_value = math.acos(values[0])
+        elif int(self.operator) == 18:
+            self.outputs[0].default_value = math.asin(values[0])
+        elif int(self.operator) == 19:
+            self.outputs[0].default_value = math.atan(values[0])
+        elif int(self.operator) == 20:
+            self.outputs[0].default_value = math.remainder(values[0], values[1])
 
 class ComparisonLogic(InputNode):
     bl_idname = "ComparisonLogic"
@@ -780,6 +804,22 @@ class SetCustomPropertyAction(ActionNode):
 
     def runScript(self):
         runScript(self)[self.inputs[0].default_value] = float(self.inputs[1].default_value)
+
+class PointAtAction(ActionNode):
+    bl_idname = "PointAtAction"
+    bl_label = "Point At"
+    bl_icon = "PLUS"
+    bl_width_default = 250
+
+    def init(self, context):
+        self.inputs.new("NodeSocketVector", "Point")
+        super().init(context)
+
+    def runScript(self):
+        object = runScript(self)
+        direction = point - object.matrix_world.to_translation()
+        rotation = direction.to_track_quat("X", "Z")
+        object.rotation_euler = rotation.to_euler()
 
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
@@ -1332,6 +1372,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("VisibilityAction", label = "Visibility"),
         nodeitems_utils.NodeItem("SetGravityAction", label = "Set Gravity"),
         nodeitems_utils.NodeItem("SetCustomPropertyAction", label = "Set Custom Property"),
+        nodeitems_utils.NodeItem("PointAtAction", label = "Point At"),
     ]),
     NodeCategory("LOOPNODES", "Logic", items = [
         nodeitems_utils.NodeItem("RepeatLoop", label = "Repeat"),
@@ -1363,7 +1404,7 @@ nodeCategories = [
          nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction)
 run = False
 event = None
 mouse = (0, 0)
