@@ -1441,8 +1441,6 @@ def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
 
 def register():
-    bpy.types.WindowManager.event = e
-    bpy.types.WindowManager.mouse = (e.mouse_x, e.mouse_y)
     bpy.types.Object.variables = {}
     for cls in classes:
         bpy.utils.register_class(cls)
