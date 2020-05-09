@@ -1403,7 +1403,6 @@ nodeCategories = [
     ]),
 ]
 classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction)
-bpy.types.WindowManager.mouse = (0, 0)
 addonKeymaps = []
 
 def update():
@@ -1434,11 +1433,14 @@ def update():
 
 def retrieveEvents():
     bpy.ops.wm.event("INVOKE_DEFAULT")
+    return 0.01
 
 def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
 
 def register():
+    bpy.types.WindowManager.event = e
+    bpy.types.WindowManager.mouse = (e.mouse_x, e.mouse_y)
     bpy.types.Object.variables = {}
     for cls in classes:
         bpy.utils.register_class(cls)
