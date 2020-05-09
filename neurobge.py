@@ -48,7 +48,7 @@ class OnKeyEvent(LogicNode):
         runScript(self)
 
     def updateNode(self):
-        if str(event.type) == str(chr(ord("@") + int(self.key))) and event.value == "PRESS":
+        if str(bpy.types.WindowManager.event.type) == str(chr(ord("@") + int(self.key))) and bpy.types.WindowManager.event.value == "PRESS":
             self.runScript()
 
 class OnClickEvent(LogicNode):
@@ -70,7 +70,7 @@ class OnClickEvent(LogicNode):
         runScript(self)
 
     def updateNode(self):
-        if str(event.type) == "LEFTMOUSE" and event.value == "PRESS":
+        if str(bpy.types.WindowManager.event.type) == "LEFTMOUSE" and bpy.types.WindowManager.event.value == "PRESS":
             self.runScript()
 
 class OnInteractionEvent(LogicNode):
@@ -93,7 +93,7 @@ class OnInteractionEvent(LogicNode):
         runScript(self)
 
     def updateNode(self):
-        if run:
+        if bpy.types.WindowManager.run:
             if "object" in self:
                 object = self["object"]
             else:
@@ -213,9 +213,9 @@ class MouseInput(InputNode):
         self.outputs.new("NodeSocketBool", "Click")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = mouse[0]
-        self.outputs[1].default_value = mouse[1]
-        if str(event.type) == "LEFTMOUSE" and event.value == "PRESS":
+        self.outputs[0].default_value = bpy.types.WindowManager.mouse[0]
+        self.outputs[1].default_value = bpy.types.WindowManager.mouse[1]
+        if str(bpy.types.WindowManager.event.type) == "LEFTMOUSE" and bpy.types.WindowManager.event.value == "PRESS":
             self.outputs[2].default_value = True
         else:
             self.outputs[2].default_value = False
@@ -744,7 +744,7 @@ class DelayAction(ActionNode):
         super().init(context)
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             runScript(self)
 
     def runScript(self):
@@ -833,19 +833,19 @@ class PlayerController(ActionNode):
         super().init(context)
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             object = runScript(self)
             speed = self.inputs[1].default_value
             damping = 1 / self.inputs[2].default_value
             self["velocity"][0] *= damping
             self["velocity"][1] *= damping
-            if str(event.type) == "W" and event.value == "PRESS":
+            if str(bpy.types.WindowManager.event.type) == "W" and bpy.types.WindowManager.event.value == "PRESS":
                 self["velocity"][0] += speed
-            elif str(event.type) == "A" and event.value == "PRESS":
+            elif str(bpy.types.WindowManager.event.type) == "A" and bpy.types.WindowManager.event.value == "PRESS":
                 self["velocity"][1] -= speed
-            elif str(event.type) == "S" and event.value == "PRESS":
+            elif str(bpy.types.WindowManager.event.type) == "S" and bpy.types.WindowManager.event.value == "PRESS":
                 self["velocity"][0] -= speed
-            elif str(event.type) == "D" and event.value == "PRESS":
+            elif str(bpy.types.WindowManager.event.type) == "D" and bpy.types.WindowManager.event.value == "PRESS":
                 self["velocity"][1] += speed
             if self.inputs[0].default_value:
                 object.rotation_euler.z -= math.radians(self["velocity"][1]) * 10
@@ -876,7 +876,7 @@ class UIController(ActionNode):
         layout.prop(self, "type", text = "")
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             object = runScript(self)
             value = float(self.inputs[0].default_value)
             if int(self.type) == 1:
@@ -981,13 +981,13 @@ class RepeatLoop(LogicNode):
         print("Node removed", self)
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             runScript(self)
 
     def runScript(self):
         for i in range(self.inputs[1].default_value):
             bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value*i)
-        if run:
+        if bpy.types.WindowManager.run:
             runScript(self, "End")
 
 class RepeatUntilLoop(LogicNode):
@@ -1009,7 +1009,7 @@ class RepeatUntilLoop(LogicNode):
         print("Node removed", self)
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             if self.inputs[1].default_value:
                 runScript(self, "End")
             else:
@@ -1039,7 +1039,7 @@ class WhileLoop(LogicNode):
         print("Node removed", self)
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             if self.inputs[1].default_value:
                 runScript(self)
                 bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value)
@@ -1068,7 +1068,7 @@ class ModeratorLogic(LogicNode):
         print("Node removed", self)
 
     def loop(self):
-        if run:
+        if bpy.types.WindowManager.run:
             runScript(self, "2nd")
 
     def runScript(self):
@@ -1112,8 +1112,8 @@ class RunOperator(bpy.types.Operator):
     bl_description = "Run all"
 
     def execute(self, context):
-        global run, keymaps
-        run = True
+        global keymaps
+        bpy.types.WindowManager.run = True
         try:
             for nodeTree in bpy.data.node_groups:
                 for node in nodeTree.nodes:
@@ -1152,8 +1152,7 @@ class StopOperator(bpy.types.Operator):
     bl_description = "Stop all"
 
     def execute(self, context):
-        global run
-        run = False
+        bpy.types.WindowManager.run = False
         bpy.context.scene.frame_end = 250
         bpy.ops.screen.animation_cancel(restore_frame = True)
         area = next(area for area in bpy.context.screen.areas if area.type == "VIEW_3D")
@@ -1249,9 +1248,8 @@ class EventOperator(bpy.types.Operator):
         return {"FINISHED"}
 
     def invoke(self, context, e):
-        global event, mouse
-        event = e
-        mouse = (e.mouse_x, e.mouse_y)
+        bpy.types.WindowManager.event = e
+        bpy.types.WindowManager.mouse = (e.mouse_x, e.mouse_y)
         return self.execute(context)
 
 class BuildMenuOperator(bpy.types.Operator):
@@ -1405,13 +1403,11 @@ nodeCategories = [
     ]),
 ]
 classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction)
-run = False
-event = None
-mouse = (0, 0)
+bpy.types.WindowManager.mouse = (0, 0)
 addonKeymaps = []
 
 def update():
-    if run:
+    if bpy.types.WindowManager.run:
         bpy.ops.object.select_all(action = "DESELECT")
         try:
             for nodeTree in bpy.data.node_groups:
