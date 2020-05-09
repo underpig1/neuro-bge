@@ -1411,8 +1411,6 @@ mouse = (0, 0)
 addonKeymaps = []
 
 def update():
-    print(event)
-    print(run)
     if run:
         bpy.ops.object.select_all(action = "DESELECT")
         try:
