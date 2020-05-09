@@ -817,7 +817,7 @@ class PointAtAction(ActionNode):
 
     def runScript(self):
         object = runScript(self)
-        direction = self.inputs[0].default_value - object.matrix_world.to_translation()
+        direction = mathutils.Vector(tuple(self.inputs[0].default_value)) - object.matrix_world.to_translation()
         rotation = direction.to_track_quat("X", "Z")
         object.rotation_euler = rotation.to_euler()
 
