@@ -1,4 +1,5 @@
 # NeuroBGE
+## [Wiki](https://github.com/underpig1/neuro-bge/wiki) | [Quickstart Guide](https://github.com/underpig1/neuro-bge/wiki/Quickstart-Guide)
 ![NeuroBGE Storefront](images/storefront.png)
 #### A node-based Blender game engine and logic editor addon for Blender
 ##
