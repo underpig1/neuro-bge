@@ -1325,7 +1325,7 @@ class AddTriggerOperator(bpy.types.Operator, bpy_extras.object_utils.AddObjectHe
         return {"FINISHED"}
 
 def addTrigger(self, context):
-    self.layout.operator("mesh.trigger", text = "Add Trigger", icon = "PLUGIN")
+    self.layout.operator("mesh.trigger", text = "Trigger", icon = "MOD_WIREFRAME")
     context.active_object["trigger"] = True
 
 def collision(object1, object2):
