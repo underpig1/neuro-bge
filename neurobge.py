@@ -1405,7 +1405,7 @@ nodeCategories = [
 classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction)
 addonKeymaps = []
 
-def update():
+def update(scene):
     if bpy.types.WindowManager.run:
         bpy.ops.object.select_all(action = "DESELECT")
         try:
@@ -1429,7 +1429,6 @@ def update():
                                 node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
         except StopIteration:
             pass
-    return 0.01
 
 def retrieveEvents(scene):
     bpy.ops.wm.event("INVOKE_DEFAULT")
@@ -1448,6 +1447,7 @@ def register():
     km = wm.keyconfigs.addon.keymaps.new(name = "Object Mode", space_type = "EMPTY")
     kmi = km.keymap_items.new("wm.menu", "E", "PRESS")
     addonKeymaps.append(km)
+    bpy.app.handlers.frame_change_pre.append(update)
     bpy.app.handlers.frame_change_pre.append(retrieveEvents)
     bpy.app.handlers.save_pre.append(storeData)
 
