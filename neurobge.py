@@ -6,6 +6,7 @@ import math
 import bpy_extras
 import os
 import aud
+from bpy.app.handlers import persistent
 
 class LogicEditor(bpy.types.NodeTree):
     bl_idname = "LogicEditor"
@@ -1430,9 +1431,11 @@ def update(scene):
         except StopIteration:
             pass
 
+@persistent
 def retrieveEvents(scene):
     bpy.ops.wm.event("INVOKE_DEFAULT")
 
+@persistent
 def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
 
