@@ -833,7 +833,6 @@ class PlayerController(ActionNode):
         super().init(context)
 
     def loop(self):
-        retrieveEvents()
         if bpy.types.WindowManager.run:
             object = runScript(self)
             speed = self.inputs[1].default_value
