@@ -1393,11 +1393,11 @@ def update():
                                 node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
         except StopIteration:
             pass
-    return 1
+    return 0.01
 
 def retrieveEvents():
     bpy.ops.wm.event("INVOKE_DEFAULT")
-    return 1
+    return 0.01
 
 def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
