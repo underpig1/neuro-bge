@@ -1297,6 +1297,37 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     def execute(self, context):
         return self.build(context)
 
+class AddTriggerOperator(bpy.types.Operator, bpy_extras.object_utils.AddObjectHelper):
+    bl_idname = "mesh.trigger"
+    bl_label = "Add Trigger Object"
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        verts = [
+            mathutils.Vector((-1, 1, -1)),
+            mathutils.Vector((1, 1, -1)),
+            mathutils.Vector((1, -1, -1)),
+            mathutils.Vector((-1, -1, -1)),
+            mathutils.Vector((-1, 1, 1)),
+            mathutils.Vector((1, 1, 1)),
+            mathutils.Vector((1, -1, 1)),
+            mathutils.Vector((-1, -1, 1)),
+        ]
+        edges = [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 7], [7, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7],
+        ]
+        faces = []
+        mesh = bpy.data.meshes.new(name = "Trigger")
+        mesh.from_pydata(verts, edges, faces)
+        bpy_extras.object_utils.object_data_add(context, mesh, operator = self)
+        return {"FINISHED"}
+
+def addTrigger(self, context):
+    self.layout.operator("mesh.trigger", text = "Add Trigger", icon = "PLUGIN")
+    context.active_object["trigger"] = True
+
 def collision(object1, object2):
     box1 = [object1.matrix_world @ mathutils.Vector(corner) for corner in object1.bound_box]
     box2 = [object2.matrix_world @ mathutils.Vector(corner) for corner in object2.bound_box]
@@ -1403,7 +1434,7 @@ nodeCategories = [
          nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator)
 addonKeymaps = []
 
 @persistent
@@ -1454,6 +1485,7 @@ def register():
     bpy.app.handlers.frame_change_pre.append(update)
     bpy.app.handlers.frame_change_pre.append(retrieveEvents)
     bpy.app.handlers.save_pre.append(storeData)
+    bpy.types.VIEW3D_MT_add.append(addTrigger)
 
 def unregister():
     for cls in classes:
@@ -1467,6 +1499,7 @@ def unregister():
     addonKeymaps.clear()
     bpy.app.handlers.frame_change_pre.clear()
     bpy.app.handlers.save_pre.clear()
+    bpy.types.VIEW3D_MT_add.remove(addTrigger)
 
 if __name__ == "__main__":
     try:
