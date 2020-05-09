@@ -16,7 +16,7 @@ class LogicEditor(bpy.types.NodeTree):
 #    bl_idname = "GameView"
 #    bl_label = "Game View"
 #    bl_icon = "BLENDER"
-    
+
 class LogicNode(bpy.types.Node):
     @classmethod
     def poll(cls, ntree):
@@ -31,23 +31,23 @@ class OnKeyEvent(LogicNode):
         name = "Key",
         items = (("1", "A", "A Key"), ("2", "B", "B Key"), ("3", "C", "C Key"), ("4", "D", "D Key"), ("5", "E", "E Key"), ("6", "F", "F Key"), ("7", "G", "G Key"), ("8", "H", "H Key"), ("9", "I", "I Key"), ("10", "J", "J Key"), ("11", "K", "K Key"), ("12", "L", "L Key"), ("13", "M", "M Key"), ("14", "N", "N Key"), ("15", "O", "O Key"), ("16", "P", "P Key"), ("17", "Q", "Q Key"), ("18", "R", "R Key"), ("19", "S", "S Key"), ("20", "T", "T Key"), ("21", "U", "U Key"), ("22", "V", "V Key"), ("23", "W", "W Key"), ("24", "X", "X Key"), ("25", "Y", "Y Key"), ("26", "Z", "Z Key"), ("27", "0", "0 Key"), ("28", "1", "1 Key"), ("29", "2", "2 Key"), ("30", "3", "3 Key"), ("31", "4", "4 Key"), ("32", "5", "5 Key"), ("33", "6", "6 Key"), ("34", "7", "7 Key"), ("35", "8", "8 Key"), ("36", "9", "9 Key"))
     )
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-        
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "key", text = "")
-    
+
     def runScript(self):
         runScript(self)
-    
-    def update(self):
+
+    def updateNode(self):
         if str(event.type) == str(chr(ord("@") + int(self.key))) and event.value == "PRESS":
             self.runScript()
 
@@ -56,20 +56,20 @@ class OnClickEvent(LogicNode):
     bl_label = "On Click"
     bl_icon = "PLUS"
     continuousUpdate = True
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def runScript(self):
         runScript(self)
-    
-    def update(self):
+
+    def updateNode(self):
         if str(event.type) == "LEFTMOUSE" and event.value == "PRESS":
             self.runScript()
 
@@ -78,21 +78,21 @@ class OnInteractionEvent(LogicNode):
     bl_label = "On Interaction"
     bl_icon = "PLUS"
     continuousUpdate = True
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
         self.outputs.new("NodeSocketBool", "Interaction")
-    
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def runScript(self):
         runScript(self)
-        
-    def update(self):
+
+    def updateNode(self):
         if run:
             if "object" in self:
                 object = self["object"]
@@ -117,16 +117,16 @@ class Output(LogicNode):
     bl_idname = "Output"
     bl_label = "Output"
     bl_icon = "BLENDER"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketShader", "Script")
-    
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def runScript(self):
         pass
 
@@ -134,20 +134,20 @@ class ActionNode(LogicNode):
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
         self.inputs.new("NodeSocketShader", "Script")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
 
 class InputNode(LogicNode):
     def copy(self, node):
         print("Copied node", node)
-    
+
     def free(self):
         print("Node removed", self)
-    
+
     def callConnected(self):
         self.retrieveValues()
         for output in self.outputs:
@@ -164,11 +164,11 @@ class ObjectPositionInput(InputNode):
     bl_label = "Object Position"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = runScript(self).location
 
@@ -177,11 +177,11 @@ class ObjectRotationInput(InputNode):
     bl_label = "Object Rotation"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
-    
+
     def retrieveValues(self):
         rotation = runScript(self).rotation_euler
         self.outputs[0].default_value = mathutils.Vector((math.degrees(rotation[0]), math.degrees(rotation[1]), math.degrees(rotation[2])))
@@ -191,11 +191,11 @@ class ObjectScaleInput(InputNode):
     bl_label = "Object Scale"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = runScript(self).scale
 
@@ -205,13 +205,13 @@ class MouseInput(InputNode):
     bl_icon = "PLUS"
     nodeType = "InputNode"
     continuousUpdate = True
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketFloat", "X")
         self.outputs.new("NodeSocketFloat", "Y")
         self.outputs.new("NodeSocketBool", "Click")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = mouse[0]
         self.outputs[1].default_value = mouse[1]
@@ -219,8 +219,8 @@ class MouseInput(InputNode):
             self.outputs[2].default_value = True
         else:
             self.outputs[2].default_value = False
-    
-    def update(self):
+
+    def updateNode(self):
         self.retrieveValues()
 
 class GravityInput(InputNode):
@@ -228,11 +228,11 @@ class GravityInput(InputNode):
     bl_label = "Gravity"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = bpy.context.scene.gravity
 
@@ -241,15 +241,15 @@ class CustomPropertyInput(InputNode):
     bl_label = "Custom Property"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketString", "Property")
         self.outputs.new("NodeSocketFloat", "Value")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = runScript(self)[self.inputs[1].default_value]
-        
+
 class MathInput(InputNode):
     bl_idname = "MathInput"
     bl_label = "Math"
@@ -259,16 +259,16 @@ class MathInput(InputNode):
         name = "Operator",
         items = (("1", "Add", "Addition operator"), ("2", "Subtract", "Subtraction operator"), ("3", "Multiply", "Multiplication operator"), ("4", "Divide", "Division operator"), ("5", "Min", "Minimum operator"), ("6", "Max", "Maximum operator"), ("7", "Power", "Exponent operator"), ("8", "Modulo", "Modulo operator"))
     )
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketFloat", "Value")
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketFloat", "Value")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "operator", text = "")
-    
+
     def retrieveValues(self):
         values = [float(self.inputs[1].default_value), float(self.inputs[2].default_value)]
         if int(self.operator) == 1:
@@ -297,16 +297,16 @@ class ComparisonLogic(InputNode):
         name = "Operator",
         items = (("1", "Greater Than", "Greater than"), ("2", "Less Than", "Less than"), ("3", "Greater Than Or Equal To", "Greater than or equal to"), ("4", "Less Than Or Equal To", "Less than or equal to"), ("5", "Equal To", "Equal to"), ("6", "Not Equal To", "Not equal to"))
     )
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketFloat", "Value")
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketBool", "Value")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "operator", text = "")
-    
+
     def retrieveValues(self):
         values = [float(self.inputs[1].default_value), float(self.inputs[2].default_value)]
         if int(self.operator) == 1:
@@ -331,16 +331,16 @@ class GateLogic(InputNode):
         name = "Operator",
         items = (("1", "And", "And gate"), ("2", "Or", "Or gate"), ("3", "Not", "Not gate"),  ("4", "Not And", "Not and gate"), ("5", "Not Or", "Not or gate"))
     )
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketBool", "Value")
         self.inputs.new("NodeSocketBool", "Value")
         self.outputs.new("NodeSocketBool", "Value")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "operator", text = "")
-    
+
     def retrieveValues(self):
         values = [float(self.inputs[1].default_value), float(self.inputs[2].default_value)]
         if int(self.operator) == 1:
@@ -359,14 +359,14 @@ class SeperateVectorInput(InputNode):
     bl_label = "Seperate Vector"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketVector", "Vector")
         self.outputs.new("NodeSocketFloat", "X")
         self.outputs.new("NodeSocketFloat", "Y")
         self.outputs.new("NodeSocketFloat", "Z")
-    
+
     def retrieveValues(self):
         value = mathutils.Vector(tuple(self.inputs[1].default_value))
         self.outputs[0].default_value = value[0]
@@ -378,14 +378,14 @@ class CombineVectorInput(InputNode):
     bl_label = "Combine Vector"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketFloat", "X")
         self.inputs.new("NodeSocketFloat", "Y")
         self.inputs.new("NodeSocketFloat", "Z")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = mathutils.Vector((float(self.inputs[1].default_value), float(self.inputs[2].default_value), float(self.inputs[3].default_value)))
 
@@ -398,16 +398,16 @@ class VectorMathInput(InputNode):
         name = "Operator",
         items = (("1", "Add", "Addition operator"), ("2", "Subtract", "Subtraction operator"), ("3", "Multiply", "Multiplication operator"), ("4", "Divide", "Division operator"), ("5", "Min", "Minimum operator"), ("6", "Max", "Maximum operator"), ("7", "Power", "Exponent operator"), ("8", "Modulo", "Modulo operator"))
     )
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketVector", "Vector")
         self.outputs.new("NodeSocketVector", "Vector")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "operator", text = "")
-    
+
     def retrieveValues(self):
         values = [mathutils.Vector(tuple(self.inputs[1].default_value)), mathutils.Vector(tuple(self.inputs[2].default_value))]
         if int(self.operator) == 1:
@@ -438,16 +438,16 @@ class VectorTransformInput(InputNode):
         name = "Operator",
         items = (("1", "Multiply", "Multiplication operator"), ("2", "Divide", "Division operator"))
     )
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketVector", "Vector")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "operator", text = "")
-    
+
     def retrieveValues(self):
         values = [mathutils.Vector(tuple(self.inputs[1].default_value)), float(self.inputs[2].default_value)]
         if int(self.operator) == 1:
@@ -460,12 +460,12 @@ class DistanceInput(InputNode):
     bl_label = "Distance"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketVector", "Vector")
         self.outputs.new("NodeSocketFloat", "Distance")
-    
+
     def retrieveValues(self):
         values = [tuple(self.inputs[0].default_value), tuple(self.inputs[1].default_value)]
         self.outputs[0].default_value = math.sqrt((values[0][0] - values[1][0])**2 + (values[0][1] - values[1][1])**2 + (values[0][2] - values[1][2])**2)
@@ -477,19 +477,19 @@ class ObjectiveInput(InputNode):
     nodeType = "InputNode"
     continuousUpdate = True
     objective = bpy.props.StringProperty()
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "objective", bpy.data, "objects", text = "")
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketBool", "Object")
-    
+
     def retrieveValues(self):
         self["object"] = bpy.data.objects[str(self.objective)]
         for link in self.outputs[0].links:
             link.to_node["objective"] = runScript(self)
-    
-    def update(self):
+
+    def updateNode(self):
         self.retrieveValues()
 
 class InteractionInput(InputNode):
@@ -497,12 +497,12 @@ class InteractionInput(InputNode):
     bl_label = "Interaction"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketBool", "Object")
         self.outputs.new("NodeSocketBool", "Interaction")
-        
+
     def retrieveValues(self):
         object = runScript(self)
         objective = self["objective"]
@@ -520,13 +520,13 @@ class VariableInput(InputNode):
     bl_icon = "PLUS"
     nodeType = "InputNode"
     variable = bpy.props.EnumProperty(name = "Variable", items = populateVariables)
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketFloat", "Value")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "variable", text = "")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = bpy.types.Object.variables[self.variable]
 
@@ -535,11 +535,11 @@ class DegreesToRadiansInput(InputNode):
     bl_label = "Degrees To Radians"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketFloat", "Value")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = math.radians(self.inputs[0].default_value)
 
@@ -548,11 +548,11 @@ class RadiansToDegreesInput(InputNode):
     bl_label = "Radians To Degrees"
     bl_icon = "PLUS"
     nodeType = "InputNode"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketFloat", "Value")
-    
+
     def retrieveValues(self):
         self.outputs[0].default_value = math.degrees(self.inputs[0].default_value)
 
@@ -561,14 +561,14 @@ class SetVariableAction(ActionNode):
     bl_label = "Set Variable"
     bl_icon = "PLUS"
     variable = bpy.props.EnumProperty(name = "Variable", items = populateVariables)
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Value")
         super().init(context)
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "variable", text = "")
-    
+
     def runScript(self):
         bpy.types.Object.variables[self.variable] = float(self.inputs[0].default_value)
         runScript(self)
@@ -578,13 +578,13 @@ class ScriptAction(ActionNode):
     bl_label = "Script"
     bl_icon = "PLUS"
     script = bpy.props.StringProperty()
-    
+
     def init(self, context):
         super().init(context)
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "script", bpy.data, "texts", text = "")
-    
+
     def runScript(self):
         #text = bpy.data.texts.load(str(self.script))
         text = bpy.data.texts[str(self.script)]
@@ -598,12 +598,12 @@ class MoveAction(ActionNode):
     bl_label = "Move"
     bl_icon = "PLUS"
     bl_width_default = 250
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Local")
         self.inputs.new("NodeSocketVector", "Vector")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         vector = mathutils.Matrix.Translation(tuple(self.inputs[1].default_value))
@@ -619,12 +619,12 @@ class RotateAction(ActionNode):
     bl_label = "Rotate"
     bl_icon = "PLUS"
     bl_width_default = 250
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Local")
         self.inputs.new("NodeSocketVector", "Vector")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         if self.inputs[0].default_value:
@@ -641,12 +641,12 @@ class ScaleAction(ActionNode):
     bl_label = "Scale"
     bl_icon = "PLUS"
     bl_width_default = 250
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Local")
         self.inputs.new("NodeSocketVector", "Vector")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         object.scale.x += list(self.inputs[1].default_value)[0]
@@ -658,13 +658,13 @@ class SetTransformAction(ActionNode):
     bl_label = "Set Transform"
     bl_icon = "PLUS"
     bl_width_default = 250
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketVector", "Position")
         self.inputs.new("NodeSocketVector", "Rotation")
         self.inputs.new("NodeSocketVector", "Scale")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         object.location.x = list(self.inputs[0].default_value)[0]
@@ -681,12 +681,12 @@ class ParentAction(ActionNode):
     bl_idname = "ParentAction"
     bl_label = "Parent"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Object")
         self.inputs.new("NodeSocketBool", "Maintain Relative Position")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         objective = self["objective"]
@@ -698,11 +698,11 @@ class RemoveParentAction(ActionNode):
     bl_idname = "RemoveParentAction"
     bl_label = "Remove Parent"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Maintain Relative Position")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         matrix = object.matrix_world.copy()
@@ -714,15 +714,15 @@ class DelayAction(ActionNode):
     bl_idname = "DelayAction"
     bl_label = "Delay"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Delay")
         super().init(context)
-    
+
     def loop(self):
         if run:
             runScript(self)
-    
+
     def runScript(self):
         bpy.app.timers.register(self.loop, first_interval = self.inputs[0].default_value)
 
@@ -730,11 +730,11 @@ class MergeScriptAction(ActionNode):
     bl_idname = "MergeScriptAction"
     bl_label = "Merge Script"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketShader", "Script")
         super().init(context)
-    
+
     def runScript(self):
         pass
 
@@ -742,11 +742,11 @@ class VisibilityAction(ActionNode):
     bl_idname = "VisibilityAction"
     bl_label = "Visibility"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Appear")
         super().init(context)
-    
+
     def runScript(self):
         object = runScript(self)
         if self.inputs[0].default_value:
@@ -760,11 +760,11 @@ class SetGravityAction(ActionNode):
     bl_idname = "SetGravityAction"
     bl_label = "Set Gravity"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketVector", "Vector")
         super().init(context)
-    
+
     def runScript(self):
         bpy.context.scene.gravity = mathutils.Vector(tuple(self.inputs[0].default_value))
 
@@ -772,12 +772,12 @@ class SetCustomPropertyAction(ActionNode):
     bl_idname = "SetCustomPropertyAction"
     bl_label = "Set Custom Property"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketString", "Property")
         self.inputs.new("NodeSocketFloat", "Value")
         super().init(context)
-    
+
     def runScript(self):
         runScript(self)[self.inputs[0].default_value] = float(self.inputs[1].default_value)
 
@@ -785,13 +785,13 @@ class PlayerController(ActionNode):
     bl_idname = "PlayerController"
     bl_label = "Player Controller"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Skewed")
         self.inputs.new("NodeSocketFloat", "Speed")
         self.inputs.new("NodeSocketFloat", "Damping")
         super().init(context)
-    
+
     def loop(self):
         if run:
             object = runScript(self)
@@ -813,7 +813,7 @@ class PlayerController(ActionNode):
             else:
                 object.matrix_basis @= mathutils.Matrix.Translation(self["velocity"])
             bpy.app.timers.register(self.loop, first_interval = 0.01)
-    
+
     def runScript(self):
         self["velocity"] = mathutils.Vector((0, 0, 0))
         bpy.app.timers.register(self.loop, first_interval = 0.01)
@@ -827,14 +827,14 @@ class UIController(ActionNode):
         name = "Type",
         items = (("1", "Gauge", "Gauge controller"), ("2", "Meter", "Meter controller"))
     )
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Value")
         super().init(context)
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "type", text = "")
-    
+
     def loop(self):
         if run:
             object = runScript(self)
@@ -844,7 +844,7 @@ class UIController(ActionNode):
             elif int(self.type) == 2:
                 object.rotation_euler.z = self["value"][1][2] + math.radians(value)
             bpy.app.timers.register(self.loop, first_interval = 0.01)
-    
+
     def runScript(self):
         object = runScript(self)
         self["value"] = (object.location, object.rotation_euler)
@@ -856,13 +856,13 @@ class SceneController(ActionNode):
     bl_label = "Scene Controller"
     bl_icon = "PLUS"
     scene = bpy.props.StringProperty()
-    
+
     def init(self, context):
         super().init(context)
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "scene", bpy.data, "scenes", text = "")
-    
+
     def runScript(self):
         bpy.context.window.scene = bpy.data.scenes[str(self.scene)]
         runScript(self)
@@ -872,13 +872,13 @@ class AudioController(ActionNode):
     bl_label = "Audio Controller"
     bl_icon = "PLUS"
     audio = bpy.props.StringProperty()
-    
+
     def init(self, context):
         super().init(context)
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "audio", bpy.data, "sounds", text = "")
-    
+
     def runScript(self):
         device = aud.Device()
         sound = aud.Sound(bpy.data.sounds[str(self.audio)].filepath)
@@ -895,7 +895,7 @@ class AudioController(ActionNode):
 #            self.loc = self.inputs[1].links[0].from_node.outputs[0].default_value
 #        else:
 #            self.local = self.inputs[0].default_value
-            
+
 
 #def stopPlayback(scene):
 #    if scene.frame_current == 30:
@@ -908,16 +908,16 @@ class OnRunEvent(LogicNode):
     bl_idname = "OnRunEvent"
     bl_label = "On Run"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-        
+
     def runScript(self):
         print("OnRunEvent")
         runScript(self)
@@ -926,24 +926,24 @@ class RepeatLoop(LogicNode):
     bl_idname = "RepeatLoop"
     bl_label = "Repeat"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
         self.inputs.new("NodeSocketShader", "Script")
         self.outputs.new("NodeSocketShader", "End")
         self.inputs.new("NodeSocketInt", "Repeat")
         self.inputs.new("NodeSocketFloat", "Relief")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def loop(self):
         if run:
             runScript(self)
-    
+
     def runScript(self):
         for i in range(self.inputs[1].default_value):
             bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value*i)
@@ -954,20 +954,20 @@ class RepeatUntilLoop(LogicNode):
     bl_idname = "RepeatUntilLoop"
     bl_label = "Repeat Until"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
         self.inputs.new("NodeSocketShader", "Script")
         self.outputs.new("NodeSocketShader", "End")
         self.inputs.new("NodeSocketBool", "Condition")
         self.inputs.new("NodeSocketFloat", "Relief")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def loop(self):
         if run:
             if self.inputs[1].default_value:
@@ -975,7 +975,7 @@ class RepeatUntilLoop(LogicNode):
             else:
                 runScript(self)
                 bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value)
-    
+
     def runScript(self):
         bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value)
         runScript(self)
@@ -984,20 +984,20 @@ class WhileLoop(LogicNode):
     bl_idname = "WhileLoop"
     bl_label = "While"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
         self.inputs.new("NodeSocketShader", "Script")
         self.outputs.new("NodeSocketShader", "End")
         self.inputs.new("NodeSocketBool", "Condition")
         self.inputs.new("NodeSocketFloat", "Relief")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def loop(self):
         if run:
             if self.inputs[1].default_value:
@@ -1005,7 +1005,7 @@ class WhileLoop(LogicNode):
                 bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value)
             else:
                 runScript(self, "End")
-    
+
     def runScript(self):
         bpy.app.timers.register(self.loop, first_interval = self.inputs[2].default_value)
         runScript(self)
@@ -1014,23 +1014,23 @@ class ModeratorLogic(LogicNode):
     bl_idname = "ModeratorLogic"
     bl_label = "Moderator"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketShader", "Script")
         self.outputs.new("NodeSocketShader", "1st")
         self.outputs.new("NodeSocketShader", "2nd")
         self.inputs.new("NodeSocketFloat", "Relief")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def loop(self):
         if run:
             runScript(self, "2nd")
-        
+
     def runScript(self):
         runScript(self, "1st")
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
@@ -1039,22 +1039,22 @@ class IfLogic(LogicNode):
     bl_idname = "IfLogic"
     bl_label = "If"
     bl_icon = "PLUS"
-    
+
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Condition")
         self.outputs.new("NodeSocketShader", "Script")
         self.inputs.new("NodeSocketShader", "Script")
         self.outputs.new("NodeSocketShader", "Else")
-        
+
     def copy(self, node):
         print("Copied node", node)
-        
+
     def free(self):
         print("Node removed", self)
-    
+
     def loop(self):
         runScript(self)
-        
+
     def runScript(self):
         if self.inputs[0].default_value:
             runScript(self)
@@ -1110,7 +1110,7 @@ class StopOperator(bpy.types.Operator):
     bl_idname = "wm.stop"
     bl_label = "Stop"
     bl_description = "Stop all"
-    
+
     def execute(self, context):
         global run
         run = False
@@ -1192,7 +1192,7 @@ class VariableOperator(bpy.types.Operator):
     bl_idname = "wm.variable"
     bl_label = "Create Variable"
     variable = bpy.props.StringProperty(name = "Variable")
-    
+
     def invoke(self, context, event):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
@@ -1218,7 +1218,7 @@ class BuildMenuOperator(bpy.types.Operator):
     bl_idname = "wm.build_menu"
     bl_label = "Build"
     bl_description = "Build game to current platform"
-    
+
     def execute(self, context):
         bpy.ops.wm.build("INVOKE_DEFAULT")
         return {"FINISHED"}
@@ -1231,7 +1231,7 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         name = "Platform",
         items = (("1", "Windows", "Build for Windows"), ("2", "Mac OSX", "Build for Mac OSX"), ("3", "Linux", "Build for Linux"))
     )
-    
+
     def build(self, context):
         if int(self.platform) == 1:
             file = open(self.filepath + ".bat", "w", encoding = "utf-8")
@@ -1376,7 +1376,7 @@ def update():
             for nodeTree in bpy.data.node_groups:
                 for node in nodeTree.nodes:
                     if hasattr(node, "continuousUpdate"):
-                        node.update()
+                        node.updateNode()
                     if hasattr(node, "nodeType"):
                         if len(node.inputs) > 0:
                             if node.nodeType == "InputNode" and node.inputs[0].default_value:
