@@ -1369,7 +1369,7 @@ event = None
 mouse = (0, 0)
 addonKeymaps = []
 
-def update():
+def updateScene():
     if run:
         bpy.ops.object.select_all(action = "DESELECT")
         try:
@@ -1406,7 +1406,7 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     nodeitems_utils.register_node_categories("LOGIC_NODES", nodeCategories)
-    bpy.app.timers.register(update)
+    bpy.app.timers.register(updateScene)
     bpy.types.VIEW3D_HT_header.append(drawItem)
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name = "Object Mode", space_type = "EMPTY")
@@ -1419,7 +1419,7 @@ def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
     nodeitems_utils.unregister_node_categories("LOGIC_NODES")
-    bpy.app.timers.unregister(update)
+    bpy.app.timers.unregister(updateScene)
     bpy.types.VIEW3D_HT_header.remove(drawItem)
     wm = bpy.context.window_manager
     for km in addonKeymaps:
