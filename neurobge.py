@@ -1439,6 +1439,7 @@ def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
 
 def register():
+    bpy.ops.wm.event("INVOKE_DEFAULT")
     bpy.types.WindowManager.event = e
     bpy.types.WindowManager.mouse = (e.mouse_x, e.mouse_y)
     bpy.types.Object.variables = {}
