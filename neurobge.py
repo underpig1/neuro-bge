@@ -1436,9 +1436,8 @@ def update():
             pass
     return 0.01
 
-def retrieveEvents():
+def retrieveEvents(scene):
     bpy.ops.wm.event("INVOKE_DEFAULT")
-    return 0.01
 
 def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
@@ -1449,12 +1448,12 @@ def register():
         bpy.utils.register_class(cls)
     nodeitems_utils.register_node_categories("LOGIC_NODES", nodeCategories)
     bpy.app.timers.register(update)
-    bpy.app.timers.register(retrieveEvents)
     bpy.types.VIEW3D_HT_header.append(drawItem)
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name = "Object Mode", space_type = "EMPTY")
     kmi = km.keymap_items.new("wm.menu", "E", "PRESS")
     addonKeymaps.append(km)
+    bpy.app.handlers.frame_change_pre.append(retrieveEvents)
     bpy.app.handlers.save_pre.append(storeData)
 
 def unregister():
@@ -1462,7 +1461,6 @@ def unregister():
         bpy.utils.unregister_class(cls)
     nodeitems_utils.unregister_node_categories("LOGIC_NODES")
     bpy.app.timers.unregister(update)
-    bpy.app.timers.unregister(retrieveEvents)
     bpy.types.VIEW3D_HT_header.remove(drawItem)
     wm = bpy.context.window_manager
     for km in addonKeymaps:
