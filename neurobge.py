@@ -833,6 +833,7 @@ class PlayerController(ActionNode):
         super().init(context)
 
     def loop(self):
+        retrieveEvents()
         if bpy.types.WindowManager.run:
             object = runScript(self)
             speed = self.inputs[1].default_value
@@ -1406,6 +1407,7 @@ classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEv
 addonKeymaps = []
 
 def update():
+    bpy.ops.wm.event("INVOKE_DEFAULT")
     if bpy.types.WindowManager.run:
         bpy.ops.object.select_all(action = "DESELECT")
         try:
@@ -1439,7 +1441,6 @@ def storeData(scene):
     bpy.context.scene["variables"] = str(bpy.types.Object.variables)
 
 def register():
-    retrieveEvents()
     bpy.types.WindowManager.event = e
     bpy.types.WindowManager.mouse = (e.mouse_x, e.mouse_y)
     bpy.types.Object.variables = {}
