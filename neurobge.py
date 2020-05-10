@@ -611,6 +611,20 @@ class RadiansToDegreesInput(InputNode):
     def retrieveValues(self):
         self.outputs[0].default_value = math.degrees(self.inputs[0].default_value)
 
+class RandomRangeInput(InputNode):
+    bl_idname = "RadiansToDegreesInput"
+    bl_label = "Radians To Degrees"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Value")
+        self.inputs.new("NodeSocketFloat", "Value")
+        self.outputs.new("NodeSocketFloat", "Value")
+
+    def retrieveValues(self):
+        self.outputs[0].default_value = random.uniform(float(self.inputs[0].default_value), float(self.inputs[1].default_value))
+
 class SetVariableAction(ActionNode):
     bl_idname = "SetVariableAction"
     bl_label = "Set Variable"
@@ -1477,7 +1491,7 @@ nodeCategories = [
          nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput)
 addonKeymaps = []
 
 @persistent
