@@ -851,7 +851,6 @@ class InstanceAction(ActionNode):
     bl_width_default = 250
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Object")
         self.outputs.new("NodeSocketBool", "Object")
         super().init(context)
 
