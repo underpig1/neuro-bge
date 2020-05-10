@@ -1361,7 +1361,7 @@ def runScript(self, script = "Script"):
         for base in self.__class__.__bases__:
             if base.__name__ == "ActionNode" or base.__name__ == "InputNode":
                 output = self
-                while output.bl_idname != "Output" or output.bl_idname != "DynamicOutput":
+                while output.bl_idname != "Output":
                     node = output
                     for outputs in node.outputs:
                         for links in outputs.links:
