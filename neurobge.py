@@ -936,6 +936,18 @@ class SceneController(ActionNode):
 
     def runScript(self):
         bpy.context.window.scene = bpy.data.scenes[str(self.scene)]
+        bpy.context.scene.frame_end = 1048574
+        bpy.ops.screen.animation_play()
+        bpy.ops.object.select_all(action = "DESELECT")
+        try:
+            area = next(area for area in bpy.context.screen.areas if area.type == "VIEW_3D")
+            area.spaces[0].region_3d.view_perspective = "CAMERA"
+            area.spaces[0].overlay.show_overlays = False
+            area.spaces[0].show_gizmo = False
+            area.spaces[0].show_region_header = False
+            area.spaces[0].shading.type = "RENDERED"
+        except StopIteration:
+            pass
         runScript(self)
 
 class AudioController(ActionNode):
