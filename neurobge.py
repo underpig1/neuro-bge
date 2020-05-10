@@ -612,7 +612,7 @@ class RadiansToDegreesInput(InputNode):
         self.outputs[0].default_value = math.degrees(self.inputs[0].default_value)
 
 class RandomRangeInput(InputNode):
-    bl_idname = "RadiansToDegreesInput"
+    bl_idname = "RandomRangeInput"
     bl_label = "Random Range"
     bl_icon = "PLUS"
     nodeType = "InputNode"
@@ -1022,12 +1022,12 @@ class ServerController(ActionNode):
         import time, socket, sys
         if int(self.type) == 1:
             self.soc = socket.socket()
-            self.soc.bind((self.inputs[0].default_value, self.inputs[1].default_value))
+            self.soc.bind((self.inputs[0].default_value, int(self.inputs[1].default_value)))
             self.soc.listen(1)
             self.connection, self.addr = self.soc.accept()
         elif int(self.type) == 2:
             self.soc = socket.socket()
-            self.soc.connect((self.inputs[0].default_value, self.inputs[1].default_value))
+            self.soc.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
         bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
 
