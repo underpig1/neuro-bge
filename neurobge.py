@@ -856,8 +856,9 @@ class InstanceAction(ActionNode):
         super().init(context)
 
     def runScript(self):
-        object = self["objective"].copy()
-        object.data = self["objective"].data.copy()
+        object = runScript(self)
+        objective = object.copy()
+        object.data = object.data.copy()
         object.animation_data_clear()
         bpy.context.scene.objects.link(object)
         for link in self.outputs[0].links:
