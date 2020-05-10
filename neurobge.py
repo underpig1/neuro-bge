@@ -224,6 +224,36 @@ class MouseInput(InputNode):
     def updateNode(self):
         self.retrieveValues()
 
+class KeyInput(InputNode):
+    bl_idname = "KeyInput"
+    bl_label = "Key"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+    key = bpy.props.EnumProperty(
+        name = "Key",
+        items = (("1", "A", "A Key"), ("2", "B", "B Key"), ("3", "C", "C Key"), ("4", "D", "D Key"), ("5", "E", "E Key"), ("6", "F", "F Key"), ("7", "G", "G Key"), ("8", "H", "H Key"), ("9", "I", "I Key"), ("10", "J", "J Key"), ("11", "K", "K Key"), ("12", "L", "L Key"), ("13", "M", "M Key"), ("14", "N", "N Key"), ("15", "O", "O Key"), ("16", "P", "P Key"), ("17", "Q", "Q Key"), ("18", "R", "R Key"), ("19", "S", "S Key"), ("20", "T", "T Key"), ("21", "U", "U Key"), ("22", "V", "V Key"), ("23", "W", "W Key"), ("24", "X", "X Key"), ("25", "Y", "Y Key"), ("26", "Z", "Z Key"), ("27", "0", "0 Key"), ("28", "1", "1 Key"), ("29", "2", "2 Key"), ("30", "3", "3 Key"), ("31", "4", "4 Key"), ("32", "5", "5 Key"), ("33", "6", "6 Key"), ("34", "7", "7 Key"), ("35", "8", "8 Key"), ("36", "9", "9 Key"))
+    )
+    continuousUpdate = True
+
+    def init(self, context):
+        self.inputs.new("NodeSocketBool", "Realtime")
+        self.outputs.new("NodeSocketBool", "Value")
+
+    def copy(self, node):
+        print("Copied node", node)
+
+    def free(self):
+        print("Node removed", self)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "key", text = "")
+
+    def retrieveValues(self):
+        self.outputs[0].default_value = str(bpy.types.WindowManager.event.type) == str(chr(ord("@") + int(self.key))) and bpy.types.WindowManager.event.value == "PRESS"
+
+    def updateNode(self):
+        self.retrieveValues()
+
 class GravityInput(InputNode):
     bl_idname = "GravityInput"
     bl_label = "Gravity"
@@ -1387,6 +1417,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("InteractionInput", label = "Interaction"),
         nodeitems_utils.NodeItem("GravityInput", label = "Gravity"),
         nodeitems_utils.NodeItem("CustomPropertyInput", label = "Custom Property"),
+        nodeitems_utils.NodeItem("KeyInput", label = "Key"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -1434,7 +1465,7 @@ nodeCategories = [
          nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput)
 addonKeymaps = []
 
 @persistent
