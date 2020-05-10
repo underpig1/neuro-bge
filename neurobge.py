@@ -131,6 +131,28 @@ class Output(LogicNode):
     def runScript(self):
         pass
 
+class DynamicOutput(LogicNode):
+    bl_idname = "DynamicOutput"
+    bl_label = "Dynamic Output"
+    bl_icon = "BLENDER"
+    continuousUpdate = True
+
+    def init(self, context):
+        self.inputs.new("NodeSocketShader", "Script")
+        self.inputs.new("NodeSocketBool", "Object")
+
+    def copy(self, node):
+        print("Copied node", node)
+
+    def free(self):
+        print("Node removed", self)
+
+    def runScript(self):
+        pass
+
+    def updateNode(self):
+        self["object"] = self["objective"]
+
 class ActionNode(LogicNode):
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
@@ -822,6 +844,25 @@ class PointAtAction(ActionNode):
         rotation = direction.to_track_quat("X", "Z")
         object.rotation_euler = rotation.to_euler()
 
+class InstanceAction(ActionNode):
+    bl_idname = "InstanceAction"
+    bl_label = "Instance Action"
+    bl_icon = "PLUS"
+    bl_width_default = 250
+
+    def init(self, context):
+        self.inputs.new("NodeSocketBool", "Object")
+        self.outputs.new("NodeSocketBool", "Object")
+        super().init(context)
+
+    def runScript(self):
+        object = self["objective"].copy()
+        object.data = self["objective"].data.copy()
+        object.animation_data_clear()
+        bpy.context.scene.objects.link(object)
+        for link in self.outputs[0].links:
+            link.to_node["objective"] = object
+
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
     bl_label = "Player Controller"
@@ -1390,6 +1431,7 @@ nodeCategories = [
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
+        nodeitems_utils.NodeItem("DynamicOutput", label = "Dynamic Output"),
     ]),
     NodeCategory("ACTIONNODES", "Action", items = [
         nodeitems_utils.NodeItem("MoveAction", label = "Move"),
@@ -1434,7 +1476,7 @@ nodeCategories = [
          nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, DynamicOutput)
 addonKeymaps = []
 
 @persistent
