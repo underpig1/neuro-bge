@@ -623,7 +623,8 @@ class RandomRangeInput(InputNode):
         self.outputs.new("NodeSocketFloat", "Value")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = random.uniform(float(self.inputs[0].default_value), float(self.inputs[1].default_value))
+        from random import uniform
+        self.outputs[0].default_value = uniform(float(self.inputs[0].default_value), float(self.inputs[1].default_value))
 
 class SetVariableAction(ActionNode):
     bl_idname = "SetVariableAction"
@@ -1483,6 +1484,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("DegreesToRadiansInput", label = "Degrees To Radians"),
         nodeitems_utils.NodeItem("RadiansToDegreesInput", label = "Radians To Degrees"),
         nodeitems_utils.NodeItem("DistanceInput", label = "Distance"),
+        nodeitems_utils.NodeItem("RandomRangeInput", label = "RandomRangeInput"),
     ]),
     NodeCategory("CONTROLLERNODES", "Controller", items = [
         nodeitems_utils.NodeItem("PlayerController", label = "Player Controller"),
