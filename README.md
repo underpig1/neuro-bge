@@ -13,7 +13,7 @@ Clone or [download](https://github.com/underpig1/neuro-bge/archive/master.zip) t
 - Scripting capabilities
 - Game engine
 - Build functions for supported platforms (Mac OSX*; Windows; Linux*)
-- Over forty-five nodes to develop stable games
+- Over fifty-five nodes to develop stable games
 ## Build
 ***Notice:*** *building in Blender 2.8 requires Python 3.8 to be installed*
 
