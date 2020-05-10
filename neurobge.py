@@ -613,7 +613,7 @@ class RadiansToDegreesInput(InputNode):
 
 class RandomRangeInput(InputNode):
     bl_idname = "RadiansToDegreesInput"
-    bl_label = "Radians To Degrees"
+    bl_label = "Random Range"
     bl_icon = "PLUS"
     nodeType = "InputNode"
 
@@ -983,8 +983,8 @@ class AudioController(ActionNode):
         handle = device.play(sound)
 
 class ServerController(ActionNode):
-    bl_idname = "MultiplayerController"
-    bl_label = "Multiplayer Controller"
+    bl_idname = "ServerController"
+    bl_label = "Server Controller"
     bl_icon = "PLUS"
     type = bpy.props.EnumProperty(
         name = "Type",
@@ -1533,7 +1533,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("DegreesToRadiansInput", label = "Degrees To Radians"),
         nodeitems_utils.NodeItem("RadiansToDegreesInput", label = "Radians To Degrees"),
         nodeitems_utils.NodeItem("DistanceInput", label = "Distance"),
-        nodeitems_utils.NodeItem("RandomRangeInput", label = "RandomRangeInput"),
+        nodeitems_utils.NodeItem("RandomRangeInput", label = "Random Range"),
     ]),
     NodeCategory("CONTROLLERNODES", "Controller", items = [
         nodeitems_utils.NodeItem("PlayerController", label = "Player Controller"),
