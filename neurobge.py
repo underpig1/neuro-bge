@@ -131,28 +131,6 @@ class Output(LogicNode):
     def runScript(self):
         pass
 
-class DynamicOutput(LogicNode):
-    bl_idname = "DynamicOutput"
-    bl_label = "Dynamic Output"
-    bl_icon = "BLENDER"
-    continuousUpdate = True
-
-    def init(self, context):
-        self.inputs.new("NodeSocketShader", "Script")
-        self.inputs.new("NodeSocketBool", "Object")
-
-    def copy(self, node):
-        print("Copied node", node)
-
-    def free(self):
-        print("Node removed", self)
-
-    def runScript(self):
-        pass
-
-    def updateNode(self):
-        self["object"] = self["objective"]
-
 class ActionNode(LogicNode):
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
@@ -843,25 +821,6 @@ class PointAtAction(ActionNode):
         direction = mathutils.Vector(tuple(self.inputs[0].default_value)) - object.matrix_world.to_translation()
         rotation = direction.to_track_quat("X", "Z")
         object.rotation_euler = rotation.to_euler()
-
-class InstanceAction(ActionNode):
-    bl_idname = "InstanceAction"
-    bl_label = "Instance Action"
-    bl_icon = "PLUS"
-    bl_width_default = 250
-
-    def init(self, context):
-        self.outputs.new("NodeSocketBool", "Object")
-        super().init(context)
-
-    def runScript(self):
-        object = runScript(self)
-        objective = object.copy()
-        object.data = object.data.copy()
-        object.animation_data_clear()
-        bpy.context.scene.objects.link(object)
-        for link in self.outputs[0].links:
-            link.to_node["objective"] = object
 
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
