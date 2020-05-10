@@ -982,6 +982,55 @@ class AudioController(ActionNode):
         sound = aud.Sound(bpy.data.sounds[str(self.audio)].filepath)
         handle = device.play(sound)
 
+class ServerController(ActionNode):
+    bl_idname = "MultiplayerController"
+    bl_label = "Multiplayer Controller"
+    bl_icon = "PLUS"
+    type = bpy.props.EnumProperty(
+        name = "Type",
+        items = (("1", "Server", "Server controller"), ("2", "Client", "Client controller"))
+    )
+
+    def init(self, context):
+        self.inputs.new("NodeSocketString", "Host")
+        self.inputs.new("NodeSocketString", "Port")
+        self.inputs.new("NodeSocketFloat", "Value")
+        self.outputs.new("NodeSocketFloat", "Value")
+        super().init(context)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "type", text = "")
+
+    def loop(self):
+        if bpy.types.WindowManager.run:
+            import time, socket, sys
+            if int(self.type) == 1:
+                message = str(self.inputs[2].default_value)
+                self.connection.send(message.encode())
+                message = self.connection.recv(1024)
+                message = message.decode()
+                self.outputs[0].default_value = float(message)
+            elif int(self.type) == 2:
+                message = self.soc.recv(1024)
+                message = message.decode()
+                self.outputs[0].default_value = float(message)
+                message = str(self.inputs[2].default_value)
+                self.soc.send(message.encode())
+            bpy.app.timers.register(self.loop, first_interval = 0.01)
+
+    def runScript(self):
+        import time, socket, sys
+        if int(self.type) == 1:
+            self.soc = socket.socket()
+            self.soc.bind((self.inputs[0].default_value, self.inputs[1].default_value))
+            self.soc.listen(1)
+            self.connection, self.addr = self.soc.accept()
+        elif int(self.type) == 2:
+            self.soc = socket.socket()
+            self.soc.connect((self.inputs[0].default_value, self.inputs[1].default_value))
+        bpy.app.timers.register(self.loop, first_interval = 0.01)
+        runScript(self)
+
 # XR; build; animation; render; curves; ui; tags; property keyframe; restore; button
 
 #    def update(self):
@@ -1490,10 +1539,11 @@ nodeCategories = [
         nodeitems_utils.NodeItem("PlayerController", label = "Player Controller"),
         nodeitems_utils.NodeItem("UIController", label = "UI Controller"),
         nodeitems_utils.NodeItem("SceneController", label = "Scene Controller"),
-         nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
+        nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
+        nodeitems_utils.NodeItem("ServerController", label = "Server Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController)
 addonKeymaps = []
 
 @persistent
