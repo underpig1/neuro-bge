@@ -1021,6 +1021,34 @@ class ServerController(ActionNode):
         bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
 
+class FirstPersonController(ActionNode):
+    bl_idname = "FirstPersonController"
+    bl_label = "First Person Controller"
+    bl_icon = "PLUS"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "X")
+        self.inputs.new("NodeSocketFloat", "Y")
+        self.inputs.new("NodeSocketFloat", "Sensitivity")
+        super().init(context)
+
+    def draw_color(self, context, node):
+        return (1.0, 0.4, 0.216, 0.5)
+
+    def loop(self):
+        if bpy.types.WindowManager.run:
+            object = runScript(self)
+            x = self.inputs[0].default_value
+            y = self.inputs[1].default_value
+            sensitivity = self.inputs[2].default_value
+            object.rotation_euler.z = x * sensitivity
+            object.rotation_euler.y = y * sensitivity
+            bpy.app.timers.register(self.loop, first_interval = 0.01)
+
+    def runScript(self):
+        bpy.app.timers.register(self.loop, first_interval = 0.01)
+        runScript(self)
+
 # XR; build; animation; render; curves; ui; tags; property keyframe; restore; button
 
 #    def update(self):
@@ -1532,9 +1560,10 @@ nodeCategories = [
         nodeitems_utils.NodeItem("SceneController", label = "Scene Controller"),
         nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
         nodeitems_utils.NodeItem("ServerController", label = "Server Controller"),
+        nodeitems_utils.NodeItem("FirstPersonController", label = "First Person Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController)
 addonKeymaps = []
 
 @persistent
