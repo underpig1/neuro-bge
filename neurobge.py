@@ -855,6 +855,30 @@ class PointAtAction(ActionNode):
         rotation = direction.to_track_quat("X", "Z")
         object.rotation_euler = rotation.to_euler()
 
+class ApplyForceAction(ActionNode):
+    bl_idname = "ApplyForceAction"
+    bl_label = "Apply Force"
+    bl_icon = "PLUS"
+    bl_width_default = 250
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Strength")
+        self.inputs.new("NodeSocketFloat", "Impulse")
+        self.inputs.new("NodeSocketVector", "Direction")
+
+        super().init(context)
+
+    def loop(self):
+        bpy.data.objects["APPLY_FORCE_WIND"].select_set(True)
+        bpy.ops.object.delete()
+
+    def runScript(self):
+        object = runScript(self)
+        bpy.ops.object.effector_add(type = "WIND", enter_editmode = False, location = tuple(object.location), rotation = tuple(self.inputs[2].default_value))
+        bpy.context.object.field.strength = self.inputs[0].default_value
+        bpy.context.object.name = "APPLY_FORCE_WIND"
+        bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
+
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
     bl_label = "Player Controller"
@@ -1526,6 +1550,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("SetGravityAction", label = "Set Gravity"),
         nodeitems_utils.NodeItem("SetCustomPropertyAction", label = "Set Custom Property"),
         nodeitems_utils.NodeItem("PointAtAction", label = "Point At"),
+        nodeitems_utils.NodeItem("ApplyForceAction", label = "Apply Force"),
     ]),
     NodeCategory("LOOPNODES", "Logic", items = [
         nodeitems_utils.NodeItem("RepeatLoop", label = "Repeat"),
@@ -1560,7 +1585,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("FirstPersonController", label = "First Person Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction)
 addonKeymaps = []
 
 @persistent
