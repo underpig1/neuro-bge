@@ -32,6 +32,10 @@ class OnKeyEvent(LogicNode):
         name = "Key",
         items = (("1", "A", "A Key"), ("2", "B", "B Key"), ("3", "C", "C Key"), ("4", "D", "D Key"), ("5", "E", "E Key"), ("6", "F", "F Key"), ("7", "G", "G Key"), ("8", "H", "H Key"), ("9", "I", "I Key"), ("10", "J", "J Key"), ("11", "K", "K Key"), ("12", "L", "L Key"), ("13", "M", "M Key"), ("14", "N", "N Key"), ("15", "O", "O Key"), ("16", "P", "P Key"), ("17", "Q", "Q Key"), ("18", "R", "R Key"), ("19", "S", "S Key"), ("20", "T", "T Key"), ("21", "U", "U Key"), ("22", "V", "V Key"), ("23", "W", "W Key"), ("24", "X", "X Key"), ("25", "Y", "Y Key"), ("26", "Z", "Z Key"), ("27", "0", "0 Key"), ("28", "1", "1 Key"), ("29", "2", "2 Key"), ("30", "3", "3 Key"), ("31", "4", "4 Key"), ("32", "5", "5 Key"), ("33", "6", "6 Key"), ("34", "7", "7 Key"), ("35", "8", "8 Key"), ("36", "9", "9 Key"))
     )
+    value = bpy.props.EnumProperty(
+        name = "Value",
+        items = (("ANY", "Any", "Any event"), ("PRESS", "Press", "Press event"), ("RELEASE", "Release", "Release event"))
+    )
 
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
@@ -44,12 +48,13 @@ class OnKeyEvent(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "key", text = "")
+        layout.prop(self, "value", text = "")
 
     def runScript(self):
         runScript(self)
 
     def updateNode(self):
-        if str(bpy.types.WindowManager.event.type) == str(chr(ord("@") + int(self.key))) and bpy.types.WindowManager.event.value == "PRESS":
+        if str(bpy.types.WindowManager.event.type) == str(chr(ord("@") + int(self.key))) and bpy.types.WindowManager.event.value == self.value:
             self.runScript()
 
 class OnClickEvent(LogicNode):
@@ -211,6 +216,10 @@ class KeyInput(InputNode):
         name = "Key",
         items = (("1", "A", "A Key"), ("2", "B", "B Key"), ("3", "C", "C Key"), ("4", "D", "D Key"), ("5", "E", "E Key"), ("6", "F", "F Key"), ("7", "G", "G Key"), ("8", "H", "H Key"), ("9", "I", "I Key"), ("10", "J", "J Key"), ("11", "K", "K Key"), ("12", "L", "L Key"), ("13", "M", "M Key"), ("14", "N", "N Key"), ("15", "O", "O Key"), ("16", "P", "P Key"), ("17", "Q", "Q Key"), ("18", "R", "R Key"), ("19", "S", "S Key"), ("20", "T", "T Key"), ("21", "U", "U Key"), ("22", "V", "V Key"), ("23", "W", "W Key"), ("24", "X", "X Key"), ("25", "Y", "Y Key"), ("26", "Z", "Z Key"), ("27", "0", "0 Key"), ("28", "1", "1 Key"), ("29", "2", "2 Key"), ("30", "3", "3 Key"), ("31", "4", "4 Key"), ("32", "5", "5 Key"), ("33", "6", "6 Key"), ("34", "7", "7 Key"), ("35", "8", "8 Key"), ("36", "9", "9 Key"))
     )
+    value = bpy.props.EnumProperty(
+        name = "Value",
+        items = (("ANY", "Any", "Any event"), ("PRESS", "Press", "Press event"), ("RELEASE", "Release", "Release event"))
+    )
     continuousUpdate = True
 
     def init(self, context):
@@ -225,9 +234,10 @@ class KeyInput(InputNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "key", text = "")
+        layout.prop(self, "value", text = "")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = str(bpy.types.WindowManager.event.type) == str(chr(ord("@") + int(self.key))) and bpy.types.WindowManager.event.value == "PRESS"
+        self.outputs[0].default_value = str(bpy.types.WindowManager.event.type) == str(chr(ord("@") + int(self.key))) and bpy.types.WindowManager.event.value == self.value
 
     def updateNode(self):
         self.retrieveValues()
@@ -1201,6 +1211,7 @@ class RunOperator(bpy.types.Operator):
     def execute(self, context):
         global keymaps
         bpy.types.WindowManager.run = True
+        bpy.ops.wm.event("INVOKE_DEFAULT")
         try:
             for nodeTree in bpy.data.node_groups:
                 for node in nodeTree.nodes:
