@@ -1033,7 +1033,7 @@ class FirstPersonController(ActionNode):
         super().init(context)
 
     def draw_color(self, context, node):
-        return (1.0, 0.4, 0.216, 0.5)
+        return (1.0, 0.1, 0.1, 0.5)
 
     def loop(self):
         if bpy.types.WindowManager.run:
