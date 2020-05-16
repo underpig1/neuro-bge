@@ -872,13 +872,10 @@ class ApplyForceAction(ActionNode):
 
     def runScript(self):
         object = runScript(self)
-        area = bpy.context.area.type
-        bpy.context.area.type = "VIEW_3D"
         bpy.ops.object.effector_add(type = "WIND", enter_editmode = False, location = tuple(object.location), rotation = tuple(self.inputs[2].default_value))
         bpy.context.object.field.strength = self.inputs[0].default_value
         bpy.context.object.name = "APPLY_FORCE_WIND"
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
-        bpy.context.area.type = area
 
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
