@@ -874,8 +874,8 @@ class ApplyForceAction(ActionNode):
         self["frame"] = bpy.context.scene.frame_current
         object = runScript(self)
         bpy.ops.object.effector_add(type = "WIND", enter_editmode = False, location = tuple(object.location), rotation = tuple(self.inputs[2].default_value))
-        bpy.context.object.field.strength = self.inputs[0].default_value
-        bpy.context.object.name = "APPLY_FORCE_WIND" + object.name + self["frame"]
+        bpy.context.active_object.field.strength = self.inputs[0].default_value
+        bpy.context.active_object.name = "APPLY_FORCE_WIND" + object.name + self["frame"]
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
 
 class PlayerController(ActionNode):
