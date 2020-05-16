@@ -859,7 +859,6 @@ class ApplyForceAction(ActionNode):
     bl_idname = "ApplyForceAction"
     bl_label = "Apply Force"
     bl_icon = "PLUS"
-    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Strength")
