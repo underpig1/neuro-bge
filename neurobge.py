@@ -904,9 +904,10 @@ class PlayerController(ActionNode):
             elif str(bpy.types.WindowManager.event.type) == "D" and bpy.types.WindowManager.event.value == "PRESS":
                 self["velocity"][1] += speed
             for obj in bpy.context.scene.objects:
-                if obj["trigger"] == "BOUNDARY" and collision(object, obj) and obj != object:
-                    self["velocity"][0] *= -1
-                    self["velocity"][1] *= -1
+                if "trigger" in obj:
+                    if obj["trigger"] == "BOUNDARY" and collision(object, obj) and obj != object:
+                        self["velocity"][0] *= -1
+                        self["velocity"][1] *= -1
             if self.inputs[0].default_value:
                 object.rotation_euler.z -= math.radians(self["velocity"][1]) * 10
                 object.matrix_basis @= mathutils.Matrix.Translation((0, self["velocity"][0], 0))
