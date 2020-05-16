@@ -1037,14 +1037,14 @@ class ServerController(ActionNode):
     def server():
         import socket, sys
         from time import sleep
-        self.sock = socket.socket()
-        self.sock.bind((self.inputs[0].default_value, int(self.inputs[1].default_value)))
-        self.sock.listen(1)
-        self.connection, self.addr = self.sock.accept()
+        sock = socket.socket()
+        sock.bind((self.inputs[0].default_value, int(self.inputs[1].default_value)))
+        sock.listen(1)
+        connection, addr = sock.accept()
         while True:
             message = str(self.inputs[2].default_value)
-            self.connection.send(message.encode())
-            message = self.connection.recv(1024)
+            connection.send(message.encode())
+            message = connection.recv(1024)
             message = message.decode()
             self.outputs[0].default_value = float(message)
         sock.shutdown(socket.SHUT_RDWR)
@@ -1053,20 +1053,16 @@ class ServerController(ActionNode):
     def client():
         import socket, sys
         from time import sleep
-        self.sock = socket.socket()
-        self.sock.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
+        sock = socket.socket()
+        sock.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
         while True:
-            message = self.sock.recv(1024)
+            message = sock.recv(1024)
             message = message.decode()
             self.outputs[0].default_value = float(message)
             message = str(self.inputs[2].default_value)
-            self.sock.send(message.encode())
+            sock.send(message.encode())
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
-
-thread = threading.Thread(target=process)
-thread.daemon = True
-thread.start()
 
 class FirstPersonController(ActionNode):
     bl_idname = "FirstPersonController"
