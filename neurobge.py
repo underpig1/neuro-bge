@@ -160,45 +160,23 @@ class InputNode(LogicNode):
                     for j in range(len(self.outputs[i].links)):
                         self.outputs[i].links[j].to_socket.default_value = self.outputs[i].default_value
 
-class ObjectPositionInput(InputNode):
-    bl_idname = "ObjectPositionInput"
-    bl_label = "Object Position"
+class ObjectTransformInput(InputNode):
+    bl_idname = "ObjectTransformInput"
+    bl_label = "Object Transform"
     bl_icon = "PLUS"
     nodeType = "InputNode"
 
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Realtime")
-        self.outputs.new("NodeSocketVector", "Vector")
+        self.outputs.new("NodeSocketVector", "Position")
+        self.outputs.new("NodeSocketVector", "Rotation")
+        self.outputs.new("NodeSocketVector", "Scale")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = runScript(self).location
-
-class ObjectRotationInput(InputNode):
-    bl_idname = "ObjectRotationInput"
-    bl_label = "Object Rotation"
-    bl_icon = "PLUS"
-    nodeType = "InputNode"
-
-    def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
-        self.outputs.new("NodeSocketVector", "Vector")
-
-    def retrieveValues(self):
-        rotation = runScript(self).rotation_euler
-        self.outputs[0].default_value = mathutils.Vector((math.degrees(rotation[0]), math.degrees(rotation[1]), math.degrees(rotation[2])))
-
-class ObjectScaleInput(InputNode):
-    bl_idname = "ObjectScaleInput"
-    bl_label = "Object Scale"
-    bl_icon = "PLUS"
-    nodeType = "InputNode"
-
-    def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
-        self.outputs.new("NodeSocketVector", "Vector")
-
-    def retrieveValues(self):
-        self.outputs[0].default_value = runScript(self).scale
+        object = runScript(self)
+        self.outputs[0].default_value = object.location
+        self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+        self.outputs[2].default_value = runScript(self).scale
 
 class MouseInput(InputNode):
     bl_idname = "MouseInput"
@@ -1226,9 +1204,7 @@ class RunOperator(bpy.types.Operator):
         try:
             for nodeTree in bpy.data.node_groups:
                 for node in nodeTree.nodes:
-                    if node.bl_idname == "OnRunEvent":
-                        node.runScript()
-                    elif hasattr(node, "nodeType"):
+                    if hasattr(node, "nodeType"):
                         if node.nodeType == "InputNode":
                             #node.retrieveValues()
                             #for i in range(len(node.outputs)):
@@ -1239,7 +1215,11 @@ class RunOperator(bpy.types.Operator):
                                     for i in range(len(node.outputs)):
                                         for j in range(len(node.outputs[i].links)):
                                             node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                for node in nodeTree.nodes:
+                    if node.bl_idname == "OnRunEvent":
+                        node.runScript()
             bpy.context.scene.frame_end = 1048574
+            bpy.ops.screen.animation_cancel(restore_frame = True)
             bpy.ops.screen.animation_play()
             bpy.ops.object.select_all(action = "DESELECT")
             try:
@@ -1487,9 +1467,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("OnInteractionEvent", label = "On Interaction"),
     ]),
     NodeCategory("INPUTNODES", "Input", items = [
-        nodeitems_utils.NodeItem("ObjectPositionInput", label = "Object Position"),
-        nodeitems_utils.NodeItem("ObjectRotationInput", label = "Object Rotation"),
-        nodeitems_utils.NodeItem("ObjectScaleInput", label = "Object Scale"),
+        nodeitems_utils.NodeItem("ObjectTransformInput", label = "Object Transform"),
         nodeitems_utils.NodeItem("MouseInput", label = "Mouse"),
         nodeitems_utils.NodeItem("ObjectiveInput", label = "Objective"),
         nodeitems_utils.NodeItem("InteractionInput", label = "Interaction"),
@@ -1545,7 +1523,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ServerController", label = "Server Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectPositionInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, ObjectRotationInput, ObjectScaleInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController)
 addonKeymaps = []
 
 @persistent
