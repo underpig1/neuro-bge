@@ -903,6 +903,10 @@ class PlayerController(ActionNode):
                 self["velocity"][0] -= speed
             elif str(bpy.types.WindowManager.event.type) == "D" and bpy.types.WindowManager.event.value == "PRESS":
                 self["velocity"][1] += speed
+            for obj in bpy.context.scene.objects:
+                if obj["trigger"] == "BOUNDARY" and collision(object, obj) and obj != object:
+                    self["velocity"][0] *= -1
+                    self["velocity"][1] *= -1
             if self.inputs[0].default_value:
                 object.rotation_euler.z -= math.radians(self["velocity"][1]) * 10
                 object.matrix_basis @= mathutils.Matrix.Translation((0, self["velocity"][0], 0))
@@ -1447,6 +1451,10 @@ class AddTriggerOperator(bpy.types.Operator, bpy_extras.object_utils.AddObjectHe
     bl_idname = "mesh.trigger"
     bl_label = "Add Trigger Object"
     bl_options = {"REGISTER", "UNDO"}
+    type = bpy.props.EnumProperty(
+        name = "Type",
+        items = (("TRIGGER", "Trigger", "Trigger object"), ("BOUNDARY", "Boundary", "Boundary object"))
+    )
 
     def execute(self, context):
         verts = [
@@ -1468,11 +1476,11 @@ class AddTriggerOperator(bpy.types.Operator, bpy_extras.object_utils.AddObjectHe
         mesh = bpy.data.meshes.new(name = "Trigger")
         mesh.from_pydata(verts, edges, faces)
         bpy_extras.object_utils.object_data_add(context, mesh, operator = self)
+        bpy.context.object["trigger"] = self.type
         return {"FINISHED"}
 
 def addTrigger(self, context):
     self.layout.operator("mesh.trigger", text = "Trigger", icon = "MOD_WIREFRAME")
-    context.active_object["trigger"] = True
 
 def collision(object1, object2):
     box1 = [object1.matrix_world @ mathutils.Vector(corner) for corner in object1.bound_box]
