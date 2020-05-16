@@ -1104,6 +1104,11 @@ class OnRunEvent(LogicNode):
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
 
+    def draw_buttons(self, context, layout):
+        row = layout.row()
+        row.operator("wm.run", icon = "PLAY")
+        row.operator("wm.stop", icon = "PAUSE")
+
     def copy(self, node):
         print("Copied node", node)
 
