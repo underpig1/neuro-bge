@@ -875,7 +875,7 @@ class ApplyForceAction(ActionNode):
         obj = bpy.data.objects.new("APPLY_FORCE_WIND" + object.name + str(self["frame"]), None)
         bpy.context.collection.objects.link(obj)
         obj.location = object.location
-        obj.rotation_euler = self.inputs[2].default_value
+        obj.rotation_euler = mathutils.Vector((math.radians(self.inputs[2].default_value[0]), math.radians(self.inputs[2].default_value[1]), math.radians(self.inputs[2].default_value[2])))
         obj.field.type = "WIND"
         obj.field.strength = self.inputs[0].default_value
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
