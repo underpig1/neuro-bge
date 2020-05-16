@@ -1021,35 +1021,52 @@ class ServerController(ActionNode):
         layout.label(text = "EXPERIMENTAL")
         layout.prop(self, "type", text = "")
 
-    def loop(self):
-        if bpy.types.WindowManager.run:
-            import socket, sys
-            if int(self.type) == 1:
-                message = str(self.inputs[2].default_value)
-                self.connection.send(message.encode())
-                message = self.connection.recv(1024)
-                message = message.decode()
-                self.outputs[0].default_value = float(message)
-            elif int(self.type) == 2:
-                message = self.sock.recv(1024)
-                message = message.decode()
-                self.outputs[0].default_value = float(message)
-                message = str(self.inputs[2].default_value)
-                self.sock.send(message.encode())
-            bpy.app.timers.register(self.loop, first_interval = 0.01)
-
     def runScript(self):
-        import socket, sys
+        import threading
         if int(self.type) == 1:
-            self.sock = socket.socket()
-            self.sock.bind((self.inputs[0].default_value, int(self.inputs[1].default_value)))
-            self.sock.listen(1)
-            self.connection, self.addr = self.sock.accept()
+            thread = threading.Thread(target = server)
+            thread.daemon = True
+            thread.start()
         elif int(self.type) == 2:
-            self.sock = socket.socket()
-            self.sock.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
+            thread = threading.Thread(target = client)
+            thread.daemon = True
+            thread.start()
         bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
+
+    def server():
+        import socket, sys
+        from time import sleep
+        self.sock = socket.socket()
+        self.sock.bind((self.inputs[0].default_value, int(self.inputs[1].default_value)))
+        self.sock.listen(1)
+        self.connection, self.addr = self.sock.accept()
+        while True:
+            message = str(self.inputs[2].default_value)
+            self.connection.send(message.encode())
+            message = self.connection.recv(1024)
+            message = message.decode()
+            self.outputs[0].default_value = float(message)
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+
+    def client():
+        import socket, sys
+        from time import sleep
+        self.sock = socket.socket()
+        self.sock.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
+        while True:
+            message = self.sock.recv(1024)
+            message = message.decode()
+            self.outputs[0].default_value = float(message)
+            message = str(self.inputs[2].default_value)
+            self.sock.send(message.encode())
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+
+thread = threading.Thread(target=process)
+thread.daemon = True
+thread.start()
 
 class FirstPersonController(ActionNode):
     bl_idname = "FirstPersonController"
