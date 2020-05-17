@@ -655,7 +655,6 @@ class MoveAction(ActionNode):
     bl_idname = "MoveAction"
     bl_label = "Move"
     bl_icon = "PLUS"
-    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Local")
@@ -676,7 +675,6 @@ class RotateAction(ActionNode):
     bl_idname = "RotateAction"
     bl_label = "Rotate"
     bl_icon = "PLUS"
-    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Local")
@@ -698,7 +696,6 @@ class ScaleAction(ActionNode):
     bl_idname = "ScaleAction"
     bl_label = "Scale"
     bl_icon = "PLUS"
-    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Local")
@@ -715,7 +712,6 @@ class SetTransformAction(ActionNode):
     bl_idname = "SetTransformAction"
     bl_label = "Set Transform"
     bl_icon = "PLUS"
-    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketVector", "Position")
@@ -843,7 +839,6 @@ class PointAtAction(ActionNode):
     bl_idname = "PointAtAction"
     bl_label = "Point At"
     bl_icon = "PLUS"
-    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketVector", "Point")
