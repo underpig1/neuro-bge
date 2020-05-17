@@ -616,6 +616,62 @@ class RandomRangeInput(InputNode):
         from random import uniform
         self.outputs[0].default_value = uniform(float(self.inputs[0].default_value), float(self.inputs[1].default_value))
 
+class XRInput(InputNode):
+    bl_idname = "XRInput"
+    bl_label = "XR"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+    type = bpy.props.EnumProperty(
+        name = "Type",
+        items = (("1", "Headset", "Headset XR"), ("2", "Left Touch", "Left touch XR"), ("3", "Right Touch", "Right touch XR"))
+    )
+
+    def init(self, context):
+        self.outputs.new("NodeSocketVector", "Position")
+        self.outputs.new("NodeSocketVector", "Rotation")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "type", text = "")
+
+    def retrieveValues(self):
+        if int(self.type) == 1:
+            self.outputs[0].default_value = object.location
+            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+        elif int(self.type) == 2:
+            self.outputs[0].default_value = object.location
+            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+        elif int(self.type) == 3:
+            self.outputs[0].default_value = object.location
+            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+
+class ExternalInputInput(InputNode):
+    bl_idname = "ExternalInputInput"
+    bl_label = "External Input"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+    type = bpy.props.EnumProperty(
+        name = "Type",
+        items = (("1", "Gamepad", "Gamepad input"), ("2", "Left Touch XR", "Left touch XR input"), ("3", "Right Touch XR", "Right touch XR input"))
+    )
+
+    def init(self, context):
+        self.outputs.new("NodeSocketVector", "Position")
+        self.outputs.new("NodeSocketVector", "Rotation")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "type", text = "")
+
+    def retrieveValues(self):
+        if int(self.operator) == 1:
+            self.outputs[0].default_value = object.location
+            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+        elif int(self.operator) == 2:
+            self.outputs[0].default_value = object.location
+            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+        elif int(self.operator) == 3:
+            self.outputs[0].default_value = object.location
+            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+
 class SetVariableAction(ActionNode):
     bl_idname = "SetVariableAction"
     bl_label = "Set Variable"
@@ -1100,6 +1156,66 @@ class FirstPersonController(ActionNode):
             bpy.app.timers.register(self.loop, first_interval = 0.01)
 
     def runScript(self):
+        bpy.app.timers.register(self.loop, first_interval = 0.01)
+        runScript(self)
+
+class ConfigurableController(ActionNode):
+    bl_idname = "ConfigurableController"
+    bl_label = "Configurable Controller"
+    bl_icon = "PLUS"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketBool", "Skewed")
+        self.inputs.new("NodeSocketBool", "Condition")
+        self.outputs.new("NodeSocketVector", "Velocity")
+        self.inputs.new("NodeSocketVector", "Position")
+        self.inputs.new("NodeSocketVector", "Rotation")
+        self.inputs.new("NodeSocketVector", "Scale")
+        self.inputs.new("NodeSocketFloat", "Speed")
+        self.inputs.new("NodeSocketFloat", "Damping")
+        self.inputs.new("NodeSocketBool", "Bounds")
+        super().init(context)
+
+    def loop(self):
+        if bpy.types.WindowManager.run:
+            object = runScript(self)
+            skewed = self.inputs[0].default_value
+            condition = self.inputs[1].default_value
+            position = self.inputs[2].default_value
+            rotation = self.inputs[3].default_value
+            scale = self.inputs[4].default_value
+            speed = self.inputs[5].default_value
+            damping = 1 / self.inputs[6].default_value
+            bounds = self.inputs[7].default_value
+            self["position"] *= damping
+            self["rotation"] *= damping
+            self["scale"] *= damping
+            if condition:
+                self["position"] += position
+                self["rotation"] += rotation
+                self["scale"] += scale
+            if bounds:
+                for obj in bpy.context.scene.objects:
+                    if "trigger" in obj:
+                        if obj["trigger"] == "BOUNDARY" and collision(object, obj) and obj != object:
+                            self["position"] *= -1
+                            self["rotation"] *= -1
+                            self["scale"] *= -1
+            if skewed:
+                object.matrix_basis @= mathutils.Matrix.Translation(self["position"])
+                object.rotation_euler.rotate_axis("X", math.radians(self["rotation"][0]))
+                object.rotation_euler.rotate_axis("Y", math.radians(self["rotation"][1]))
+                object.rotation_euler.rotate_axis("Z", math.radians(self["rotation"][2]))
+            else:
+                object.location += self["position"]
+                object.rotation_euler += self["rotation"]
+            object.scale += self["scale"]
+            bpy.app.timers.register(self.loop, first_interval = 0.01)
+
+    def runScript(self):
+        self["position"] = mathutils.Vector((0, 0, 0))
+        self["rotation"] = mathutils.Vector((0, 0, 0))
+        self["scale"] = mathutils.Vector((0, 0, 0))
         bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
 
@@ -1626,9 +1742,10 @@ nodeCategories = [
         nodeitems_utils.NodeItem("AudioController", label = "Audio Controller"),
         nodeitems_utils.NodeItem("ServerController", label = "Server Controller"),
         nodeitems_utils.NodeItem("FirstPersonController", label = "First Person Controller"),
+        nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController)
 addonKeymaps = []
 
 @persistent
