@@ -875,6 +875,22 @@ class ApplyForceAction(ActionNode):
         obj.field.strength = self.inputs[0].default_value
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
 
+class SetActiveCameraAction(ActionNode):
+    bl_idname = "SetActiveCameraAction"
+    bl_label = "Set Active Camera"
+    bl_icon = "PLUS"
+    camera = bpy.props.StringProperty()
+
+    def init(self, context):
+        super().init(context)
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "camera", bpy.data, "cameras", text = "")
+
+    def runScript(self):
+        bpy.context.scene.camera = bpy.data.objects[str(self.script)]
+        runScript(self)
+
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
     bl_label = "Player Controller"
@@ -1575,6 +1591,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("SetCustomPropertyAction", label = "Set Custom Property"),
         nodeitems_utils.NodeItem("PointAtAction", label = "Point At"),
         nodeitems_utils.NodeItem("ApplyForceAction", label = "Apply Force"),
+        nodeitems_utils.NodeItem("SetActiveCameraAction", label = "Set Active Camera"),
     ]),
     NodeCategory("LOOPNODES", "Logic", items = [
         nodeitems_utils.NodeItem("RepeatLoop", label = "Repeat"),
@@ -1609,7 +1626,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("FirstPersonController", label = "First Person Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction)
 addonKeymaps = []
 
 @persistent
