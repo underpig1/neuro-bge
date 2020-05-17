@@ -1024,20 +1024,20 @@ class ServerController(ActionNode):
     def runScript(self):
         import threading
         if int(self.type) == 1:
-            thread = threading.Thread(target = server)
+            thread = threading.Thread(target = self.server)
             thread.daemon = True
             thread.start()
         elif int(self.type) == 2:
-            thread = threading.Thread(target = client)
+            thread = threading.Thread(target = self.client)
             thread.daemon = True
             thread.start()
-        bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
 
-    def server():
+    def server(self):
         import socket, sys
         from time import sleep
         sock = socket.socket()
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.inputs[0].default_value, int(self.inputs[1].default_value)))
         sock.listen(1)
         connection, addr = sock.accept()
@@ -1050,10 +1050,11 @@ class ServerController(ActionNode):
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
 
-    def client():
+    def client(self):
         import socket, sys
         from time import sleep
         sock = socket.socket()
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
         while True:
             message = sock.recv(1024)
