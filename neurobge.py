@@ -34,7 +34,8 @@ class OnKeyEvent(LogicNode):
     )
     value = bpy.props.EnumProperty(
         name = "Value",
-        items = (("ANY", "Any", "Any event"), ("PRESS", "Press", "Press event"), ("RELEASE", "Release", "Release event"))
+        items = (("ANY", "Any", "Any event"), ("PRESS", "Press", "Press event"), ("RELEASE", "Release", "Release event")),
+        default = "PRESS"
     )
 
     def init(self, context):
@@ -218,7 +219,8 @@ class KeyInput(InputNode):
     )
     value = bpy.props.EnumProperty(
         name = "Value",
-        items = (("ANY", "Any", "Any event"), ("PRESS", "Press", "Press event"), ("RELEASE", "Release", "Release event"))
+        items = (("ANY", "Any", "Any event"), ("PRESS", "Press", "Press event"), ("RELEASE", "Release", "Release event")),
+        default = "PRESS"
     )
     continuousUpdate = True
 
