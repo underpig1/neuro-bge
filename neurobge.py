@@ -1163,6 +1163,7 @@ class ConfigurableController(ActionNode):
     bl_idname = "ConfigurableController"
     bl_label = "Configurable Controller"
     bl_icon = "PLUS"
+    bl_width_default = 250
 
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Skewed")
