@@ -164,7 +164,10 @@ class InputNode(LogicNode):
                         link.to_node.callConnected()
                 for i in range(len(self.outputs)):
                     for j in range(len(self.outputs[i].links)):
-                        self.outputs[i].links[j].to_socket.default_value = self.outputs[i].default_value
+                        try:
+                            self.outputs[i].links[j].to_socket.default_value = self.outputs[i].default_value
+                        except:
+                            pass
 
 class ObjectTransformInput(InputNode):
     bl_idname = "ObjectTransformInput"
@@ -1090,6 +1093,7 @@ class ServerController(ActionNode, InputNode):
 
     def draw_buttons(self, context, layout):
         layout.label(text = "EXPERIMENTAL")
+        layout.label(text = "IP Address: " + socket.gethostbyname(socket.gethostname()))
         layout.prop(self, "type", text = "")
 
     def runScript(self):
