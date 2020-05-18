@@ -1167,11 +1167,12 @@ class ConfigurableController(ActionNode):
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Skewed")
         self.inputs.new("NodeSocketBool", "Condition")
-        self.outputs.new("NodeSocketVector", "Velocity")
         self.inputs.new("NodeSocketVector", "Position")
         self.inputs.new("NodeSocketVector", "Rotation")
         self.inputs.new("NodeSocketVector", "Scale")
-        self.inputs.new("NodeSocketFloat", "Speed")
+        self.outputs.new("NodeSocketVector", "Position")
+        self.outputs.new("NodeSocketVector", "Rotation")
+        self.outputs.new("NodeSocketVector", "Scale")
         self.inputs.new("NodeSocketFloat", "Damping")
         self.inputs.new("NodeSocketBool", "Bounds")
         super().init(context)
@@ -1184,32 +1185,58 @@ class ConfigurableController(ActionNode):
             position = self.inputs[2].default_value
             rotation = self.inputs[3].default_value
             scale = self.inputs[4].default_value
-            speed = self.inputs[5].default_value
-            damping = 1 / self.inputs[6].default_value
-            bounds = self.inputs[7].default_value
-            self["position"] *= damping
-            self["rotation"] *= damping
-            self["scale"] *= damping
+            damping = 1 / self.inputs[5].default_value
+            bounds = self.inputs[6].default_value
+            self["position"][0] *= damping
+            self["position"][1] *= damping
+            self["position"][2] *= damping
+            self["rotation"][0] *= damping
+            self["rotation"][1] *= damping
+            self["rotation"][2] *= damping
+            self["scale"][0] *= damping
+            self["scale"][1] *= damping
+            self["scale"][2] *= damping
             if condition:
-                self["position"] += position
-                self["rotation"] += rotation
-                self["scale"] += scale
+                self["position"][0] += position[0]
+                self["position"][1] += position[1]
+                self["position"][2] += position[2]
+                self["rotation"][0] += rotation[0]
+                self["rotation"][1] += rotation[1]
+                self["rotation"][2] += rotation[2]
+                self["scale"][0] += scale[0]
+                self["scale"][1] += scale[1]
+                self["scale"][2] += scale[2]
             if bounds:
                 for obj in bpy.context.scene.objects:
                     if "trigger" in obj:
                         if obj["trigger"] == "BOUNDARY" and collision(object, obj) and obj != object:
-                            self["position"] *= -1
-                            self["rotation"] *= -1
-                            self["scale"] *= -1
+                            self["position"][0] *= -1
+                            self["position"][0] *= -1
+                            self["position"][0] *= -1
+                            self["rotation"][0] *= -1
+                            self["rotation"][0] *= -1
+                            self["rotation"][0] *= -1
+                            self["scale"][0] *= -1
+                            self["scale"][0] *= -1
+                            self["scale"][0] *= -1
             if skewed:
-                object.matrix_basis @= mathutils.Matrix.Translation(self["position"])
+                object.matrix_basis @= mathutils.Matrix.Translation(tuple(self["position"]))
                 object.rotation_euler.rotate_axis("X", math.radians(self["rotation"][0]))
                 object.rotation_euler.rotate_axis("Y", math.radians(self["rotation"][1]))
                 object.rotation_euler.rotate_axis("Z", math.radians(self["rotation"][2]))
             else:
-                object.location += self["position"]
-                object.rotation_euler += self["rotation"]
-            object.scale += self["scale"]
+                object.location.x += self["position"][0]
+                object.location.y += self["position"][1]
+                object.location.z += self["position"][2]
+                object.rotation_euler.x += math.radians(self["rotation"][0])
+                object.rotation_euler.y += math.radians(self["rotation"][1])
+                object.rotation_euler.z += math.radians(self["rotation"][2])
+            object.scale.x += self["scale"][0]
+            object.scale.y += self["scale"][1]
+            object.scale.z += self["scale"][2]
+            self.outputs[0].default_value = mathutils.Vector(tuple(self["position"]))
+            self.outputs[1].default_value = mathutils.Vector(tuple(self["rotation"]))
+            self.outputs[2].default_value = mathutils.Vector(tuple(self["scale"]))
             bpy.app.timers.register(self.loop, first_interval = 0.01)
 
     def runScript(self):
