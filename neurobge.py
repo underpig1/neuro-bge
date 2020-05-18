@@ -946,7 +946,7 @@ class SetActiveCameraAction(ActionNode):
         layout.prop_search(self, "camera", bpy.data, "cameras", text = "")
 
     def runScript(self):
-        bpy.context.scene.camera = bpy.data.objects[str(self.script)]
+        bpy.context.scene.camera = bpy.data.objects[str(self.camera)]
         runScript(self)
 
 class PlayerController(ActionNode):
@@ -1069,7 +1069,7 @@ class AudioController(ActionNode):
         sound = aud.Sound(bpy.data.sounds[str(self.audio)].filepath)
         handle = device.play(sound)
 
-class ServerController(ActionNode):
+class ServerController(ActionNode, InputNode):
     bl_idname = "ServerController"
     bl_label = "Server Controller"
     bl_icon = "PLUS"
@@ -1159,7 +1159,7 @@ class FirstPersonController(ActionNode):
         bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
 
-class ConfigurableController(ActionNode):
+class ConfigurableController(ActionNode, InputNode):
     bl_idname = "ConfigurableController"
     bl_label = "Configurable Controller"
     bl_icon = "PLUS"
