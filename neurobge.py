@@ -1078,6 +1078,8 @@ class ServerController(ActionNode, InputNode):
         items = (("1", "Server", "Server controller"), ("2", "Client", "Client controller"))
     )
     bl_width_default = 250
+    nodeType = "InputNode"
+    continuousUpdate = True
 
     def init(self, context):
         self.inputs.new("NodeSocketString", "Host")
@@ -1134,6 +1136,12 @@ class ServerController(ActionNode, InputNode):
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
 
+    def retrieveValues(self):
+        pass
+
+    def updateNode(self):
+        self.retrieveValues()
+
 class FirstPersonController(ActionNode):
     bl_idname = "FirstPersonController"
     bl_label = "First Person Controller"
@@ -1164,6 +1172,8 @@ class ConfigurableController(ActionNode, InputNode):
     bl_label = "Configurable Controller"
     bl_icon = "PLUS"
     bl_width_default = 250
+    nodeType = "InputNode"
+    continuousUpdate = True
 
     def init(self, context):
         self.inputs.new("NodeSocketBool", "Skewed")
@@ -1246,6 +1256,12 @@ class ConfigurableController(ActionNode, InputNode):
         self["scale"] = mathutils.Vector((0, 0, 0))
         bpy.app.timers.register(self.loop, first_interval = 0.01)
         runScript(self)
+
+    def retrieveValues(self):
+        pass
+
+    def updateNode(self):
+        self.retrieveValues()
 
 # XR; build; animation; render; curves; ui; tags; property keyframe; restore; button
 
@@ -1456,7 +1472,10 @@ class RunOperator(bpy.types.Operator):
                                     node.callConnected()
                                     for i in range(len(node.outputs)):
                                         for j in range(len(node.outputs[i].links)):
-                                            node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                            try:
+                                                node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                            except:
+                                                pass
                 for node in nodeTree.nodes:
                     if node.bl_idname == "OnRunEvent":
                         node.runScript()
@@ -1793,7 +1812,10 @@ def update(scene):
                                         node.callConnected()
                                         for i in range(len(node.outputs)):
                                             for j in range(len(node.outputs[i].links)):
-                                                node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                                try:
+                                                    node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                                except:
+                                                    pass
                     if node.bl_idname == "VariableInput":
                         node.callConnected()
                         for i in range(len(node.outputs)):
