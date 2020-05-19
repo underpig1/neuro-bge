@@ -1809,17 +1809,16 @@ def update(scene):
                     if hasattr(node, "continuousUpdate"):
                         node.updateNode()
                     if hasattr(node, "nodeType"):
-                        if len(node.inputs) > 0:
-                            if node.nodeType == "InputNode" and node.inputs[0].default_value:
-                                for input in node.inputs:
-                                    if len(input.links) == 0:
-                                        node.callConnected()
-                                        for i in range(len(node.outputs)):
-                                            for j in range(len(node.outputs[i].links)):
-                                                try:
-                                                    node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
-                                                except:
-                                                    pass
+                        if node.nodeType == "InputNode":
+                            for input in node.inputs:
+                                if len(input.links) == 0:
+                                    node.callConnected()
+                                    for i in range(len(node.outputs)):
+                                        for j in range(len(node.outputs[i].links)):
+                                            try:
+                                                node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                            except:
+                                                pass
                     if node.bl_idname == "VariableInput":
                         node.callConnected()
                         for i in range(len(node.outputs)):
