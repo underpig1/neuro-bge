@@ -1467,6 +1467,14 @@ class RunOperator(bpy.types.Operator):
                                                 node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
                                             except:
                                                 pass
+                            if len(node.inputs) == 0:
+                                node.callConnected()
+                                for i in range(len(node.outputs)):
+                                    for j in range(len(node.outputs[i].links)):
+                                        try:
+                                            node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                        except:
+                                            pass
                 for node in nodeTree.nodes:
                     if node.bl_idname == "OnRunEvent":
                         node.runScript()
@@ -1806,6 +1814,14 @@ def update(scene):
                                                 node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
                                             except:
                                                 pass
+                            if len(node.inputs) == 0:
+                                node.callConnected()
+                                for i in range(len(node.outputs)):
+                                    for j in range(len(node.outputs[i].links)):
+                                        try:
+                                            node.outputs[i].links[j].to_socket.default_value = node.outputs[i].default_value
+                                        except:
+                                            pass
                     if node.bl_idname == "VariableInput":
                         node.callConnected()
                         for i in range(len(node.outputs)):
