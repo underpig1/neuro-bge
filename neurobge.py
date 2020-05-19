@@ -176,7 +176,6 @@ class ObjectTransformInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Position")
         self.outputs.new("NodeSocketVector", "Rotation")
         self.outputs.new("NodeSocketVector", "Scale")
@@ -195,7 +194,6 @@ class MouseInput(InputNode):
     continuousUpdate = True
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketFloat", "X")
         self.outputs.new("NodeSocketFloat", "Y")
         self.outputs.new("NodeSocketBool", "Click")
@@ -228,7 +226,6 @@ class KeyInput(InputNode):
     continuousUpdate = True
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketBool", "Value")
 
     def copy(self, node):
@@ -254,7 +251,6 @@ class GravityInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
 
     def retrieveValues(self):
@@ -267,12 +263,11 @@ class CustomPropertyInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketString", "Property")
         self.outputs.new("NodeSocketFloat", "Value")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = runScript(self)[self.inputs[1].default_value]
+        self.outputs[0].default_value = runScript(self)[self.inputs[0].default_value]
 
 class MathInput(InputNode):
     bl_idname = "MathInput"
@@ -285,7 +280,6 @@ class MathInput(InputNode):
     )
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketFloat", "Value")
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketFloat", "Value")
@@ -294,7 +288,7 @@ class MathInput(InputNode):
         layout.prop(self, "operator", text = "")
 
     def retrieveValues(self):
-        values = [float(self.inputs[1].default_value), float(self.inputs[2].default_value)]
+        values = [float(self.inputs[0].default_value), float(self.inputs[1].default_value)]
         if int(self.operator) == 1:
             self.outputs[0].default_value = values[0] + values[1]
         elif int(self.operator) == 2:
@@ -347,7 +341,6 @@ class ComparisonLogic(InputNode):
     )
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketFloat", "Value")
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketBool", "Value")
@@ -356,7 +349,7 @@ class ComparisonLogic(InputNode):
         layout.prop(self, "operator", text = "")
 
     def retrieveValues(self):
-        values = [float(self.inputs[1].default_value), float(self.inputs[2].default_value)]
+        values = [float(self.inputs[0].default_value), float(self.inputs[1].default_value)]
         if int(self.operator) == 1:
             self.outputs[0].default_value = values[0] > values[1]
         elif int(self.operator) == 2:
@@ -381,7 +374,6 @@ class GateLogic(InputNode):
     )
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketBool", "Value")
         self.inputs.new("NodeSocketBool", "Value")
         self.outputs.new("NodeSocketBool", "Value")
@@ -390,7 +382,7 @@ class GateLogic(InputNode):
         layout.prop(self, "operator", text = "")
 
     def retrieveValues(self):
-        values = [float(self.inputs[1].default_value), float(self.inputs[2].default_value)]
+        values = [float(self.inputs[0].default_value), float(self.inputs[1].default_value)]
         if int(self.operator) == 1:
             self.outputs[0].default_value = values[0] and values[1]
         elif int(self.operator) == 2:
@@ -409,14 +401,13 @@ class SeperateVectorInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketVector", "Vector")
         self.outputs.new("NodeSocketFloat", "X")
         self.outputs.new("NodeSocketFloat", "Y")
         self.outputs.new("NodeSocketFloat", "Z")
 
     def retrieveValues(self):
-        value = mathutils.Vector(tuple(self.inputs[1].default_value))
+        value = mathutils.Vector(tuple(self.inputs[0].default_value))
         self.outputs[0].default_value = value[0]
         self.outputs[1].default_value = value[1]
         self.outputs[2].default_value = value[2]
@@ -428,14 +419,13 @@ class CombineVectorInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.outputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketFloat", "X")
         self.inputs.new("NodeSocketFloat", "Y")
         self.inputs.new("NodeSocketFloat", "Z")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = mathutils.Vector((float(self.inputs[1].default_value), float(self.inputs[2].default_value), float(self.inputs[3].default_value)))
+        self.outputs[0].default_value = mathutils.Vector((float(self.inputs[0].default_value), float(self.inputs[1].default_value), float(self.inputs[2].default_value)))
 
 class VectorMathInput(InputNode):
     bl_idname = "VectorMathInput"
@@ -448,7 +438,6 @@ class VectorMathInput(InputNode):
     )
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketVector", "Vector")
         self.outputs.new("NodeSocketVector", "Vector")
@@ -457,7 +446,7 @@ class VectorMathInput(InputNode):
         layout.prop(self, "operator", text = "")
 
     def retrieveValues(self):
-        values = [mathutils.Vector(tuple(self.inputs[1].default_value)), mathutils.Vector(tuple(self.inputs[2].default_value))]
+        values = [mathutils.Vector(tuple(self.inputs[0].default_value)), mathutils.Vector(tuple(self.inputs[1].default_value))]
         if int(self.operator) == 1:
             self.outputs[0].default_value = values[0] + values[1]
         elif int(self.operator) == 2:
@@ -488,7 +477,6 @@ class VectorTransformInput(InputNode):
     )
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketVector", "Vector")
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketVector", "Vector")
@@ -497,7 +485,7 @@ class VectorTransformInput(InputNode):
         layout.prop(self, "operator", text = "")
 
     def retrieveValues(self):
-        values = [mathutils.Vector(tuple(self.inputs[1].default_value)), float(self.inputs[2].default_value)]
+        values = [mathutils.Vector(tuple(self.inputs[0].default_value)), float(self.inputs[1].default_value)]
         if int(self.operator) == 1:
             self.outputs[0].default_value = values[0] * values[1]
         elif int(self.operator) == 2:
@@ -547,7 +535,6 @@ class InteractionInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Realtime")
         self.inputs.new("NodeSocketBool", "Object")
         self.outputs.new("NodeSocketBool", "Interaction")
 
