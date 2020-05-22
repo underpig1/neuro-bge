@@ -518,12 +518,13 @@ class ObjectiveInput(InputNode):
         layout.prop_search(self, "objective", bpy.data, "objects", text = "")
 
     def init(self, context):
-        self.outputs.new("NodeSocketBool", "Object")
+        self.outputs.new("NodeSocketObject", "Object")
 
     def retrieveValues(self):
+        object = runScript(self)
         self["object"] = bpy.data.objects[str(self.objective)]
         for link in self.outputs[0].links:
-            link.to_node["objective"] = runScript(self)
+            link.to_node["objective"] = object
 
     def updateNode(self):
         self.retrieveValues()
@@ -535,7 +536,7 @@ class InteractionInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Object")
+        self.inputs.new("NodeSocketObject", "Object")
         self.outputs.new("NodeSocketBool", "Interaction")
 
     def retrieveValues(self):
@@ -785,7 +786,7 @@ class ParentAction(ActionNode):
     bl_icon = "PLUS"
 
     def init(self, context):
-        self.inputs.new("NodeSocketBool", "Object")
+        self.inputs.new("NodeSocketObject", "Object")
         self.inputs.new("NodeSocketBool", "Maintain Relative Position")
         super().init(context)
 
@@ -1267,6 +1268,13 @@ class ConfigurableController(ActionNode, InputNode):
 
     def updateNode(self):
         self.retrieveValues()
+
+class NodeSocketObject(bpy.types.NodeSocket):
+    bl_idname = "NodeSocketObject"
+    bl_label = "Node Socket Object"
+
+    def draw_color(self, context, node):
+        return (1.0, 0.4, 0.4, 1.0)
 
 # XR; build; animation; render; curves; ui; tags; property keyframe; restore; button
 
@@ -1805,7 +1813,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject)
 addonKeymaps = []
 
 @persistent
