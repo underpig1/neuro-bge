@@ -663,6 +663,38 @@ class ExternalInputInput(InputNode):
             self.outputs[0].default_value = object.location
             self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
 
+class ValueInput(InputNode):
+    bl_idname = "ValueInput"
+    bl_label = "Value"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Value")
+        self.outputs.new("NodeSocketFloat", "Value")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "variable", text = "")
+
+    def retrieveValues(self):
+        self.outputs[0].default_value = self.inputs[0].default_value
+
+class VectorInput(InputNode):
+    bl_idname = "VectorInput"
+    bl_label = "Vector"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Vector")
+        self.outputs.new("NodeSocketFloat", "Vector")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "variable", text = "")
+
+    def retrieveValues(self):
+        self.outputs[0].default_value = self.inputs[0].default_value
+
 class SetVariableAction(ActionNode):
     bl_idname = "SetVariableAction"
     bl_label = "Set Variable"
