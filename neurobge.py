@@ -904,23 +904,37 @@ class ApplyForceAction(ActionNode):
     bl_icon = "PLUS"
 
     def init(self, context):
-        self.inputs.new("NodeSocketFloat", "Strength")
+        self.inputs.new("NodeSocketBool", "Local")
         self.inputs.new("NodeSocketFloat", "Impulse")
-        self.inputs.new("NodeSocketVector", "Direction")
+        self.inputs.new("NodeSocketVector", "Vector")
         super().init(context)
 
     def loop(self):
-        bpy.ops.object.delete({"selected_objects": [bpy.context.scene.objects["APPLY_FORCE_WIND" + runScript(self).name + str(self["frame"])]]})
+        bpy.ops.object.delete({"selected_objects": [bpy.context.scene.objects["APPLY_FORCE_WIND_X" + runScript(self).name + str(self["frame"])], bpy.context.scene.objects["APPLY_FORCE_WIND_Y" + runScript(self).name + str(self["frame"])], bpy.context.scene.objects["APPLY_FORCE_WIND_Z" + runScript(self).name + str(self["frame"])]]})
 
     def runScript(self):
         self["frame"] = bpy.context.scene.frame_current
         object = runScript(self)
-        obj = bpy.data.objects.new("APPLY_FORCE_WIND" + object.name + str(self["frame"]), None)
-        bpy.context.collection.objects.link(obj)
-        obj.location = object.location
-        obj.rotation_euler = mathutils.Vector((math.radians(self.inputs[2].default_value[0]), math.radians(self.inputs[2].default_value[1]), math.radians(self.inputs[2].default_value[2])))
+        x = bpy.data.objects.new("APPLY_FORCE_WIND_X" + object.name + str(self["frame"]), None)
+        y = bpy.data.objects.new("APPLY_FORCE_WIND_Y" + object.name + str(self["frame"]), None)
+        z = bpy.data.objects.new("APPLY_FORCE_WIND_Z" + object.name + str(self["frame"]), None)
+        bpy.context.collection.objects.link(x)
+        bpy.context.collection.objects.link(y)
+        bpy.context.collection.objects.link(z)
+        if self.inputs[0].default_value:
+            x.location = object.location
+            y.location = object.location
+            z.location = object.location
+        else:
+            x.rotation_euler = mathutils.Vector((object.rotation_euler[0] + math.radians(90), object.rotation_euler[1], object.rotation_euler[2]))
+            y.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1] + math.radians(90), object.rotation_euler[2]))
+            z.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1], object.rotation_euler[2] + math.radians(90)))
         obj.field.type = "WIND"
-        obj.field.strength = self.inputs[0].default_value
+        obj.field.type = "WIND"
+        obj.field.type = "WIND"
+        obj.field.strength = self.inputs[2].default_value[0]
+        obj.field.strength = self.inputs[2].default_value[1]
+        obj.field.strength = self.inputs[2].default_value[2]
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
 
 class SetActiveCameraAction(ActionNode):
