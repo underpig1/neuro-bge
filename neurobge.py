@@ -1792,6 +1792,8 @@ nodeCategories = [
         nodeitems_utils.NodeItem("GravityInput", label = "Gravity"),
         nodeitems_utils.NodeItem("CustomPropertyInput", label = "Custom Property"),
         nodeitems_utils.NodeItem("KeyInput", label = "Key"),
+        nodeitems_utils.NodeItem("ValueInput", label = "Value"),
+        nodeitems_utils.NodeItem("VectorInput", label = "Vector"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -1845,7 +1847,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput)
 addonKeymaps = []
 
 @persistent
