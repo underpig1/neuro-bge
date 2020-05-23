@@ -1013,13 +1013,13 @@ class ApplyForceAction(ActionNode):
         y.location = object.location
         z.location = object.location
         if self.inputs[0].default_value:
-            x.rotation_euler = mathutils.Vector((object.rotation_euler[0] + 90, object.rotation_euler[1], object.rotation_euler[2]))
-            y.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1] + 90, object.rotation_euler[2]))
-            z.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1], object.rotation_euler[2] + 90))
+            x.rotation_euler = mathutils.Vector((object.rotation_euler[0] + math.radians(90), object.rotation_euler[1], object.rotation_euler[2]))
+            y.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1] + math.radians(90), object.rotation_euler[2]))
+            z.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1], object.rotation_euler[2] + math.radians(90)))
         else:
-            x.rotation_euler = mathutils.Vector((90, 0, 0))
-            y.rotation_euler = mathutils.Vector((0, 90, 0))
-            z.rotation_euler = mathutils.Vector((0, 0, 90))
+            x.rotation_euler = mathutils.Vector((math.radians(90), 0, 0))
+            y.rotation_euler = mathutils.Vector((0, math.radians(90), 0))
+            z.rotation_euler = mathutils.Vector((0, 0, math.radians(90)))
         x.field.type = "WIND"
         y.field.type = "WIND"
         z.field.type = "WIND"
