@@ -699,16 +699,16 @@ class AnimatedValueInput(InputNode):
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Time")
         self.outputs.new("NodeSocketFloat", "Value")
-        self["mapping"] = bpy.data.node_groups["TestCurveData"].nodes["RGB Curves"].mapping
 
     def draw_buttons(self, context, layout):
-        self["mapping"] = curveData("Mapping")
         layout.template_curve_mapping(curveData("Mapping"), "mapping")
 
     def retrieveValues(self):
-        self["mapping"].update()
-        self["mapping"].initialize()
-        self.outputs[0].default_value = self["mapping"].evaluate(self["mapping"].curves[0], self.inputs[0].default_value)
+        # bpy.data.node_groups["TestCurveData"].nodes["RGB Curves"]
+        mapping = curveData("Mapping").mapping
+        mapping.update()
+        mapping.initialize()
+        self.outputs[0].default_value = mapping.evaluate(mapping.curves[0], self.inputs[0].default_value)
 
 class FrameInput(InputNode):
     bl_idname = "FrameInput"
