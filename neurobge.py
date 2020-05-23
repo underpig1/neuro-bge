@@ -704,11 +704,11 @@ class AnimatedValueInput(InputNode):
         layout.template_curve_mapping(curveData("Mapping"), "mapping")
 
     def retrieveValues(self):
-        # bpy.data.node_groups["TestCurveData"].nodes["RGB Curves"]
+        # bpy.data.node_groups["TestCurveData"].nodes["RGB Curves"].mapping
         mapping = curveData("Mapping").mapping
         mapping.update()
         mapping.initialize()
-        self.outputs[0].default_value = mapping.evaluate(mapping.curves[0], self.inputs[0].default_value)
+        self.outputs[0].default_value = mapping.evaluate(mapping.curves[3], self.inputs[0].default_value)
 
 class FrameInput(InputNode):
     bl_idname = "FrameInput"
