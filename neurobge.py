@@ -88,7 +88,7 @@ class OnInteractionEvent(LogicNode):
 
     def init(self, context):
         self.outputs.new("NodeSocketShader", "Script")
-        self.outputs.new("NodeSocketBool", "Interaction")
+        self.outputs.new("NodeSocketObject", "Interaction")
 
     def copy(self, node):
         print("Copied node", node)
@@ -699,13 +699,15 @@ class AnimatedValueInput(InputNode):
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Time")
         self.outputs.new("NodeSocketFloat", "Value")
+        self["mapping"] = str(self) + str(id(self))
 
     def draw_buttons(self, context, layout):
-        layout.template_curve_mapping(curveData("Mapping"), "mapping")
+        if "mapping" in self:
+            layout.template_curve_mapping(curveData(self["mapping"]), "mapping")
 
     def retrieveValues(self):
         # bpy.data.node_groups["TestCurveData"].nodes["RGB Curves"].mapping
-        mapping = curveData("Mapping").mapping
+        mapping = curveData(self["mapping"]).mapping
         mapping.update()
         mapping.initialize()
         self.outputs[0].default_value = mapping.evaluate(mapping.curves[3], self.inputs[0].default_value)
@@ -853,6 +855,7 @@ class SetTransformAction(ActionNode):
         self.inputs.new("NodeSocketVector", "Position")
         self.inputs.new("NodeSocketVector", "Rotation")
         self.inputs.new("NodeSocketVector", "Scale")
+        self.inputs[2].default_value = mathutils.Vector((1, 1, 1))
         super().init(context)
 
     def runScript(self):
