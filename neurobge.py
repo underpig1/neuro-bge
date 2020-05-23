@@ -683,8 +683,8 @@ class VectorInput(InputNode):
     nodeType = "InputNode"
 
     def init(self, context):
-        self.inputs.new("NodeSocketFloat", "Vector")
-        self.outputs.new("NodeSocketFloat", "Vector")
+        self.inputs.new("NodeSocketVector", "Vector")
+        self.outputs.new("NodeSocketVector", "Vector")
 
     def retrieveValues(self):
         self.outputs[0].default_value = self.inputs[0].default_value
@@ -694,16 +694,60 @@ class AnimatedValueInput(InputNode):
     bl_label = "Animated Value"
     bl_icon = "PLUS"
     nodeType = "InputNode"
+    bl_width_default = 250
 
     def init(self, context):
-        self.inputs.new("NodeSocketFloat", "Value")
+        self.inputs.new("NodeSocketFloat", "Time")
         self.outputs.new("NodeSocketFloat", "Value")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "variable", text = "")
+        layout.template_curve_mapping(curveData("Mapping"), "mapping")
 
     def retrieveValues(self):
-        self.outputs[0].default_value = self.inputs[0].default_value
+        mapping = bpy.data.node_groups["TestCurveData"].nodes["RGB Curves"].mapping
+        mapping.update()
+        mapping.initialize()
+        self.outputs[0].default_value = mapping.evaluate(mapping.curves[0], self.inputs[0].default_value)
+
+class FrameInput(InputNode):
+    bl_idname = "FrameInput"
+    bl_label = "Frame"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+    continuousUpdate = True
+
+    def init(self, context):
+        self.outputs.new("NodeSocketFloat", "Frame")
+        self.outputs.new("NodeSocketFloat", "Frame Rate")
+
+    def retrieveValues(self):
+        self.outputs[0].default_value = bpy.context.scene.frame_current
+        self.outputs[1].default_value = bpy.context.scene.render.fps
+
+    def updateNode(self):
+        self.retrieveValues()
+
+class MapRangeInput(InputNode):
+    bl_idname = "MapRangeInput"
+    bl_label = "Map Range"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+    continuousUpdate = True
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Value")
+        self.inputs.new("NodeSocketFloat", "From Min")
+        self.inputs.new("NodeSocketFloat", "From Max")
+        self.inputs.new("NodeSocketFloat", "To Min")
+        self.inputs.new("NodeSocketFloat", "To Max")
+        self.outputs.new("NodeSocketFloat", "Value")
+
+    def retrieveValues(self):
+        value, fromMin, fromMax, toMin, toMax = self.inputs[0].default_value, self.inputs[1].default_value, self.inputs[2].default_value, self.inputs[3].default_value, self.inputs[4].default_value
+        self.outputs[0].default_value = toMin + ((float(value - fromMin) / float(fromMax - fromMin)) * (toMax - toMin))
+
+    def updateNode(self):
+        self.retrieveValues()
 
 class SetVariableAction(ActionNode):
     bl_idname = "SetVariableAction"
@@ -964,20 +1008,23 @@ class ApplyForceAction(ActionNode):
         bpy.context.collection.objects.link(x)
         bpy.context.collection.objects.link(y)
         bpy.context.collection.objects.link(z)
+        x.location = object.location
+        y.location = object.location
+        z.location = object.location
         if self.inputs[0].default_value:
-            x.location = object.location
-            y.location = object.location
-            z.location = object.location
+            x.rotation_euler = mathutils.Vector((object.rotation_euler[0] + 90, object.rotation_euler[1], object.rotation_euler[2]))
+            y.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1] + 90, object.rotation_euler[2]))
+            z.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1], object.rotation_euler[2] + 90))
         else:
-            x.rotation_euler = mathutils.Vector((object.rotation_euler[0] + math.radians(90), object.rotation_euler[1], object.rotation_euler[2]))
-            y.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1] + math.radians(90), object.rotation_euler[2]))
-            z.rotation_euler = mathutils.Vector((object.rotation_euler[0], object.rotation_euler[1], object.rotation_euler[2] + math.radians(90)))
-        obj.field.type = "WIND"
-        obj.field.type = "WIND"
-        obj.field.type = "WIND"
-        obj.field.strength = self.inputs[2].default_value[0]
-        obj.field.strength = self.inputs[2].default_value[1]
-        obj.field.strength = self.inputs[2].default_value[2]
+            x.rotation_euler = mathutils.Vector((90, 0, 0))
+            y.rotation_euler = mathutils.Vector((0, 90, 0))
+            z.rotation_euler = mathutils.Vector((0, 0, 90))
+        x.field.type = "WIND"
+        y.field.type = "WIND"
+        z.field.type = "WIND"
+        x.field.strength = self.inputs[2].default_value[0]
+        y.field.strength = self.inputs[2].default_value[1]
+        z.field.strength = self.inputs[2].default_value[2]
         bpy.app.timers.register(self.loop, first_interval = self.inputs[1].default_value)
 
 class SetActiveCameraAction(ActionNode):
@@ -1314,6 +1361,10 @@ class ConfigurableController(ActionNode, InputNode):
 class NodeSocketObject(bpy.types.NodeSocket):
     bl_idname = "NodeSocketObject"
     bl_label = "Node Socket Object"
+
+    def draw(self, context, layout, node, text):
+        if self.is_linked:
+            layout.label(text)
 
     def draw_color(self, context, node):
         return (1.0, 0.4, 0.4, 1.0)
@@ -1790,6 +1841,18 @@ def report(report):
     ReportOperator.rep = report
     bpy.ops.wm.report()
 
+def curveDataNodeTree():
+    if "TestCurveData" not in bpy.data.node_groups:
+        ng = bpy.data.node_groups.new("TestCurveData", "ShaderNodeTree")
+        ng.fake_user = True
+    return bpy.data.node_groups["TestCurveData"].nodes
+
+def curveData(name):
+    if name not in curveMapping:
+        curve = curveDataNodeTree().new("ShaderNodeRGBCurve")
+        curveMapping[name] = curve.name
+    return curveDataNodeTree()[curveMapping[name]]
+
 def runScript(self, script = "Script"):
     for output in self.outputs:
         if output.name == script:
@@ -1828,6 +1891,8 @@ nodeCategories = [
         nodeitems_utils.NodeItem("KeyInput", label = "Key"),
         nodeitems_utils.NodeItem("ValueInput", label = "Value"),
         nodeitems_utils.NodeItem("VectorInput", label = "Vector"),
+        nodeitems_utils.NodeItem("AnimatedValueInput", label = "Animated Value"),
+        nodeitems_utils.NodeItem("FrameInput", label = "Frame"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -1870,6 +1935,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("RadiansToDegreesInput", label = "Radians To Degrees"),
         nodeitems_utils.NodeItem("DistanceInput", label = "Distance"),
         nodeitems_utils.NodeItem("RandomRangeInput", label = "Random Range"),
+        nodeitems_utils.NodeItem("MapRangeInput", label = "Map Range"),
     ]),
     NodeCategory("CONTROLLERNODES", "Controller", items = [
         nodeitems_utils.NodeItem("PlayerController", label = "Player Controller"),
@@ -1881,8 +1947,9 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput)
 addonKeymaps = []
+curveMapping = {}
 
 @persistent
 def update(scene):
