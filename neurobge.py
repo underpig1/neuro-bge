@@ -673,9 +673,6 @@ class ValueInput(InputNode):
         self.inputs.new("NodeSocketFloat", "Value")
         self.outputs.new("NodeSocketFloat", "Value")
 
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "variable", text = "")
-
     def retrieveValues(self):
         self.outputs[0].default_value = self.inputs[0].default_value
 
@@ -688,6 +685,19 @@ class VectorInput(InputNode):
     def init(self, context):
         self.inputs.new("NodeSocketFloat", "Vector")
         self.outputs.new("NodeSocketFloat", "Vector")
+
+    def retrieveValues(self):
+        self.outputs[0].default_value = self.inputs[0].default_value
+
+class AnimatedValueInput(InputNode):
+    bl_idname = "AnimatedValueInput"
+    bl_label = "Animated Value"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Value")
+        self.outputs.new("NodeSocketFloat", "Value")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "variable", text = "")
