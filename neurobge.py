@@ -1575,6 +1575,9 @@ class GameEngineMenu(bpy.types.Menu):
         layout.operator("wm.stop", icon = "PAUSE")
         layout.separator()
         layout.operator("wm.build_menu", icon = "DISK_DRIVE")
+        layout.separator()
+        layout.operator("object.assign_boundary", icon = "MOD_WIREFRAME")
+        layout.operator("object.assign_trigger", icon = "MOD_WIREFRAME")
 
 def drawItem(self, context):
     layout = self.layout
@@ -1602,6 +1605,10 @@ class GameEnginePanel(bpy.types.Panel):
         layout.operator("wm.variable", icon = "NETWORK_DRIVE")
         layout.separator()
         layout.operator("wm.build_menu", icon = "DISK_DRIVE")
+        layout.separator()
+        row = layout.row()
+        row.operator("object.assign_boundary", icon = "MOD_WIREFRAME")
+        row.operator("object.assign_trigger", icon = "MOD_WIREFRAME")
 
 class AssignScriptOperator(bpy.types.Operator):
     bl_idname = "wm.assign_script"
@@ -1609,7 +1616,6 @@ class AssignScriptOperator(bpy.types.Operator):
     bl_description = "Assign selected output node to selected object"
 
     def execute(self, context):
-        global id
         bpy.context.active_node["object"] = bpy.context.active_object
         return {"FINISHED"}
 
@@ -1729,6 +1735,24 @@ class AddTriggerOperator(bpy.types.Operator, bpy_extras.object_utils.AddObjectHe
         mesh.from_pydata(verts, edges, faces)
         bpy_extras.object_utils.object_data_add(context, mesh, operator = self)
         bpy.context.object["trigger"] = self.type
+        return {"FINISHED"}
+
+class AssignBoundaryOperator(bpy.types.Operator):
+    bl_idname = "object.assign_boundary"
+    bl_label = "Assign Boundary"
+    bl_description = "Assign to selected object Boundary"
+
+    def execute(self, context):
+        bpy.context.active_object["trigger"] = "BOUNDARY"
+        return {"FINISHED"}
+
+class AssignTriggerOperator(bpy.types.Operator):
+    bl_idname = "object.assign_trigger"
+    bl_label = "Assign Trigger"
+    bl_description = "Assign to selected object Trigger"
+
+    def execute(self, context):
+        bpy.context.active_object["trigger"] = "TRIGGER"
         return {"FINISHED"}
 
 def addTrigger(self, context):
