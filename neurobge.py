@@ -1820,8 +1820,52 @@ class AssignTriggerOperator(bpy.types.Operator):
         bpy.context.active_object["trigger"] = "TRIGGER"
         return {"FINISHED"}
 
-def addTrigger(self, context):
-    self.layout.operator("mesh.trigger", text = "Trigger", icon = "MOD_WIREFRAME")
+class GameEngineObjectMenu(bpy.types.Menu):
+    bl_idname = "GameEngineObjectMenu"
+    bl_label = "Game Engine"
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("mesh.trigger", text = "Trigger", icon = "MOD_WIREFRAME")
+        layout.operator("mesh.navigator", text = "Navigator", icon = "PINNED")
+
+class AddNavigatorOperator(bpy.types.Operator, bpy_extras.object_utils.AddObjectHelper):
+    bl_idname = "mesh.navigator"
+    bl_label = "Add Navigator Object"
+    bl_options = {"REGISTER", "UNDO"}
+    type = bpy.props.EnumProperty(
+        name = "Type",
+        items = (("PATROL", "Patrol", "Patrol object"), ("TARGET", "Target", "Target object"))
+    )
+
+    def execute(self, context):
+        verts = [
+            mathutils.Vector((-0.1, 0.1, 0.9)),
+            mathutils.Vector((0.1, 0.1, 0.9)),
+            mathutils.Vector((0.1, -0.1, 0.9)),
+            mathutils.Vector((-0.1, -0.1, 0.9)),
+            mathutils.Vector((-0.1, 0.1, 1.1)),
+            mathutils.Vector((0.1, 0.1, 1.1)),
+            mathutils.Vector((0.1, -0.1, 1.1)),
+            mathutils.Vector((-0.1, -0.1, 1.1)),
+            mathutils.Vector((0, 0, 0)),
+            mathutils.Vector((0, 0, 1)),
+        ]
+        edges = [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 7], [7, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7], [8, 9],
+        ]
+        faces = []
+        mesh = bpy.data.meshes.new(name = "Navigator")
+        mesh.from_pydata(verts, edges, faces)
+        bpy_extras.object_utils.object_data_add(context, mesh, operator = self)
+        bpy.context.object["navigator"] = self.type
+        return {"FINISHED"}
+
+def gameEngineObject(self, context):
+    self.layout.separator()
+    self.layout.menu("GameEngineObjectMenu", text = "Game Engine", icon = "DISK_DRIVE")
 
 def collision(object1, object2):
     box1 = [object1.matrix_world @ mathutils.Vector(corner) for corner in object1.bound_box]
@@ -1951,7 +1995,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator)
 addonKeymaps = []
 curveMapping = {}
 
@@ -2013,7 +2057,7 @@ def register():
     bpy.app.handlers.frame_change_pre.append(update)
     bpy.app.handlers.frame_change_pre.append(retrieveEvents)
     bpy.app.handlers.save_pre.append(storeData)
-    bpy.types.VIEW3D_MT_add.append(addTrigger)
+    bpy.types.VIEW3D_MT_add.append(gameEngineObject)
 
 def unregister():
     for cls in classes:
