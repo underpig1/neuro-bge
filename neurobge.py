@@ -1187,6 +1187,7 @@ class ServerController(ActionNode, InputNode):
         super().init(context)
 
     def draw_buttons(self, context, layout):
+        import socket
         layout.label(text = "EXPERIMENTAL")
         layout.label(text = "IP Address: " + socket.gethostbyname(socket.gethostname()))
         layout.prop(self, "type", text = "")
