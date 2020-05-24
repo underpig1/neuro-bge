@@ -752,6 +752,42 @@ class MapRangeInput(InputNode):
     def updateNode(self):
         self.retrieveValues()
 
+class ServerStateInput(InputNode):
+    bl_idname = "ServerStateInput"
+    bl_label = "Server State"
+    bl_icon = "PLUS"
+    nodeType = "InputNode"
+    continuousUpdate = True
+
+    def init(self, context):
+        self.inputs.new("NodeSocketString", "Host")
+        self.inputs.new("NodeSocketString", "Port")
+        self.outputs.new("NodeSocketBool", "Active")
+        self.outputs.new("NodeSocketString", "IP Address")
+
+    def retrieveValues(self):
+        import socket, threading
+        thread = threading.Thread(target = self.client)
+        thread.daemon = True
+        thread.start()
+        self.outputs[1].default_value = socket.gethostbyname(socket.gethostname())
+
+    def updateNode(self):
+        self.retrieveValues()
+
+    def client(self):
+        import socket, sys
+        from time import sleep
+        sock = socket.socket()
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            sock.connect((self.inputs[0].default_value, int(self.inputs[1].default_value)))
+            self.outputs[0].default_value = True
+        except:
+            self.outputs[0].default_value = False
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+
 class SetVariableAction(ActionNode):
     bl_idname = "SetVariableAction"
     bl_label = "Set Variable"
@@ -1942,6 +1978,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("VectorInput", label = "Vector"),
         nodeitems_utils.NodeItem("AnimatedValueInput", label = "Animated Value"),
         nodeitems_utils.NodeItem("FrameInput", label = "Frame"),
+        nodeitems_utils.NodeItem("ServerStateInput", label = "Server State"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -1996,7 +2033,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput)
 addonKeymaps = []
 curveMapping = {}
 
