@@ -1035,7 +1035,9 @@ class ApplyForceAction(ActionNode):
         super().init(context)
 
     def loop(self):
-        bpy.ops.object.delete({"selected_objects": [bpy.context.scene.objects["APPLY_FORCE_WIND_X" + runScript(self).name + str(self["frame"])], bpy.context.scene.objects["APPLY_FORCE_WIND_Y" + runScript(self).name + str(self["frame"])], bpy.context.scene.objects["APPLY_FORCE_WIND_Z" + runScript(self).name + str(self["frame"])]]})
+        object = runScript(self)
+        bpy.ops.object.delete({"selected_objects": [bpy.context.scene.objects["APPLY_FORCE_WIND_X" + object.name + str(self["frame"])], bpy.context.scene.objects["APPLY_FORCE_WIND_Y" + object.name + str(self["frame"])], bpy.context.scene.objects["APPLY_FORCE_WIND_Z" + object.name + str(self["frame"])]]})
+
 
     def runScript(self):
         self["frame"] = bpy.context.scene.frame_current
@@ -1080,6 +1082,23 @@ class SetActiveCameraAction(ActionNode):
     def runScript(self):
         bpy.context.scene.camera = bpy.data.objects[str(self.camera)]
         runScript(self)
+
+class RigidbodyAction(ActionNode):
+    bl_idname = "RigidbodyAction"
+    bl_label = "Rigidbody"
+    bl_icon = "PLUS"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketBool", "Enable")
+        super().init(context)
+
+    def runScript(self):
+        object = runScript(self)
+        bpy.ops.rigidbody.world_add()
+        if self.inputs[0].default_value:
+            bpy.context.scene.rigidbody_world.collection.objects.link(object)
+        else:
+            bpy.context.scene.rigidbody_world.collection.objects.unlink(object)
 
 class PlayerController(ActionNode):
     bl_idname = "PlayerController"
@@ -1529,6 +1548,31 @@ class NodeSocketObject(bpy.types.NodeSocket):
 
     def draw_color(self, context, node):
         return (1.0, 0.4, 0.4, 1.0)
+
+class UIButtonController(ActionNode):
+    bl_idname = "UIButtonController"
+    bl_label = "UI Button Controller"
+    bl_icon = "PLUS"
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "X")
+        self.inputs.new("NodeSocketFloat", "Y")
+        self.inputs.new("NodeSocketFloat", "Sensitivity")
+        super().init(context)
+
+    def loop(self):
+        if bpy.types.WindowManager.run:
+            object = runScript(self)
+            x = self.inputs[0].default_value
+            y = self.inputs[1].default_value
+            sensitivity = self.inputs[2].default_value
+            object.rotation_euler.z = x * sensitivity
+            object.rotation_euler.y = y * sensitivity
+            bpy.app.timers.register(self.loop, first_interval = 0.01)
+
+    def runScript(self):
+        bpy.app.timers.register(self.loop, first_interval = 0.01)
+        runScript(self)
 
 # XR; build; animation; render; curves; ui; tags; property keyframe; restore; button
 
@@ -2100,6 +2144,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("FrameInput", label = "Frame"),
         nodeitems_utils.NodeItem("ServerStateInput", label = "Server State"),
         nodeitems_utils.NodeItem("XRInput", label = "XR"),
+        nodeitems_utils.NodeItem("XRInput", label = "XR"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -2155,7 +2200,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("PathfindingAgentController", label = "Pathfinding Agent"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput, PathfindingAgentController, XRInput)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput, PathfindingAgentController, XRInput, RigidbodyAction)
 addonKeymaps = []
 curveMapping = {}
 
