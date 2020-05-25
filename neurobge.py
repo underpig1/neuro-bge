@@ -979,11 +979,9 @@ class VisibilityAction(ActionNode):
     def runScript(self):
         object = runScript(self)
         if self.inputs[0].default_value:
-            if "scale" in self:
-                object.scale = self["scale"]
+            bpy.context.object.hide_viewport = False
         else:
-            self["scale"] = object.scale
-            object.scale = mathutils.Vector((0, 0, 0))
+            bpy.context.object.hide_viewport = True
 
 class SetGravityAction(ActionNode):
     bl_idname = "SetGravityAction"
