@@ -626,8 +626,8 @@ class XRInput(InputNode):
 
     def retrieveValues(self):
         if int(self.type) == 1:
-            self.outputs[0].default_value = object.location
-            self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
+            self.outputs[0].default_value = context.window_manager.xr_session_state.viewer_pose_location
+            self.outputs[1].default_value = context.window_manager.xr_session_state.viewer_pose_rotation
         elif int(self.type) == 2:
             self.outputs[0].default_value = object.location
             self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
@@ -1399,13 +1399,135 @@ class ConfigurableController(ActionNode, InputNode):
     def updateNode(self):
         self.retrieveValues()
 
+class PathfindingNode():
+    def __init__(self, parent = None, position = None):
+        self.parent = parent
+        self.position = position
+        self.g = 0
+        self.h = 0
+        self.f = 0
+
+    def __eq__(self, other):
+        return self.position == other.position
+
+class PathfindingAgentController(ActionNode):
+    bl_idname = "PathfindingAgentController"
+    bl_label = "Pathfinding Agent"
+    bl_icon = "PLUS"
+    type = bpy.props.EnumProperty(
+        name = "Type",
+        items = (("1", "Patrol", "Patrol pathfinder"), ("2", "Target", "Target pathfinder"))
+    )
+    obj = bpy.props.StringProperty(name = "Plane")
+
+    def init(self, context):
+        self.inputs.new("NodeSocketFloat", "Speed")
+        self.inputs.new("NodeSocketInt", "Optimization")
+        self.inputs.new("NodeSocketObject", "Target")
+        super().init(context)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "type", text = "")
+        layout.prop_search(self, "obj", bpy.data, "objects", text = "")
+
+    def loop(self):
+        if bpy.types.WindowManager.run:
+            speed = self.inputs[0].default_value
+            object = runScript(self)
+            if self["position"] != len(self["path"]):
+                try:
+                    step = ((self["path"][self["position"]][0] - self["path"][self["position"] + 1][0]) / speed, (self["path"][self["position"]][1] - self["path"][self["position"] + 1][1]) / speed)
+                    object.location.x += step[0]
+                    object.location.y += step[1]
+                    if int(object.location.x) == self["path"][self["position"]][0] and int(object.location.y) == self["path"][self["position"]][1]:
+                        self["position"] += 1
+                except:
+                    pass
+                bpy.app.timers.register(self.loop, first_interval = 0.01)
+
+    def runScript(self):
+        object = runScript(self)
+        speed = 1 / self.inputs[0].default_value
+        optimization = self.inputs[1].default_value * 100
+        objective = self["objective"]
+        plane = bpy.data.objects[str(self.obj)]
+        if int(self.type) == 1:
+            maze = []
+            for i in range(optimization):
+                row = []
+                for i in range(optimization):
+                    row.append(0)
+                maze.append(row)
+            for obj in bpy.context.scene.objects:
+                if "trigger" in obj:
+                    if obj["trigger"] == "BOUNDARY" and collision(plane, obj) and obj != object:
+                        try:
+                            maze[int(obj.location.x)][int(obj.location.y)] = 1
+                            maze[int(obj.location.x + obj.dimensions.x)][int(obj.location.y + obj.dimensions.y)] = 1
+                            maze[int(obj.location.x)][int(obj.location.y + obj.dimensions.y)] = 1
+                            maze[int(obj.location.x + obj.dimensions.x)][int(obj.location.y)] = 1
+                        except:
+                            pass
+            self["path"] = self.pathfinding(maze, (int(object.location.x), int(object.location.y)), (int(objective.location.x), int(objective.location.y)))
+            print(maze)
+            print((object.location.x, object.location.y))
+            print((objective.location.x, objective.location.y))
+            print(list(self["path"]))
+        self["position"] = 0
+        bpy.app.timers.register(self.loop, first_interval = 0.01)
+        runScript(self)
+
+    def pathfinding(self, maze, start, end):
+        start_node = PathfindingNode(None, start)
+        start_node.g = start_node.h = start_node.f = 0
+        end_node = PathfindingNode(None, end)
+        end_node.g = end_node.h = end_node.f = 0
+        open_list = []
+        closed_list = []
+        open_list.append(start_node)
+        while len(open_list) > 0:
+            current_node = open_list[0]
+            current_index = 0
+            for index, item in enumerate(open_list):
+                if item.f < current_node.f:
+                    current_node = item
+                    current_index = index
+            open_list.pop(current_index)
+            closed_list.append(current_node)
+            if current_node == end_node:
+                path = []
+                current = current_node
+                while current is not None:
+                    path.append(current.position)
+                    current = current.parent
+                return path[::-1]
+            children = []
+            for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]: # Adjacent squares
+                node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
+                if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (len(maze[len(maze)-1]) -1) or node_position[1] < 0:
+                    continue
+                if maze[node_position[0]][node_position[1]] != 0:
+                    continue
+                new_node = PathfindingNode(current_node, node_position)
+                children.append(new_node)
+            for child in children:
+                for closed_child in closed_list:
+                    if child == closed_child:
+                        continue
+                child.g = current_node.g + 1
+                child.h = ((child.position[0] - end_node.position[0]) ** 2) + ((child.position[1] - end_node.position[1]) ** 2)
+                child.f = child.g + child.h
+                for open_node in open_list:
+                    if child == open_node and child.g > open_node.g:
+                        continue
+                open_list.append(child)
+
 class NodeSocketObject(bpy.types.NodeSocket):
     bl_idname = "NodeSocketObject"
     bl_label = "Node Socket Object"
 
     def draw(self, context, layout, node, text):
-        if self.is_linked:
-            layout.label(text)
+        layout.label(text)
 
     def draw_color(self, context, node):
         return (1.0, 0.4, 0.4, 1.0)
@@ -2031,9 +2153,10 @@ nodeCategories = [
         nodeitems_utils.NodeItem("ServerController", label = "Server Controller"),
         nodeitems_utils.NodeItem("FirstPersonController", label = "First Person Controller"),
         nodeitems_utils.NodeItem("ConfigurableController", label = "Configurable Controller"),
+        nodeitems_utils.NodeItem("PathfindingAgentController", label = "Pathfinding Agent"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput, PathfindingAgentController)
 addonKeymaps = []
 curveMapping = {}
 
