@@ -626,8 +626,8 @@ class XRInput(InputNode):
 
     def retrieveValues(self):
         if int(self.type) == 1:
-            self.outputs[0].default_value = context.window_manager.xr_session_state.viewer_pose_location
-            self.outputs[1].default_value = context.window_manager.xr_session_state.viewer_pose_rotation
+            self.outputs[0].default_value = bpy.context.window_manager.xr_session_state.viewer_pose_location
+            self.outputs[1].default_value = bpy.context.window_manager.xr_session_state.viewer_pose_rotation
         elif int(self.type) == 2:
             self.outputs[0].default_value = object.location
             self.outputs[1].default_value = mathutils.Vector((math.degrees(object.rotation_euler[0]), math.degrees(object.rotation_euler[1]), math.degrees(object.rotation_euler[2])))
@@ -2101,6 +2101,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("AnimatedValueInput", label = "Animated Value"),
         nodeitems_utils.NodeItem("FrameInput", label = "Frame"),
         nodeitems_utils.NodeItem("ServerStateInput", label = "Server State"),
+        nodeitems_utils.NodeItem("XRInput", label = "XR"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -2156,7 +2157,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("PathfindingAgentController", label = "Pathfinding Agent"),
     ]),
 ]
-classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput, PathfindingAgentController)
+classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput, PathfindingAgentController, XRInput)
 addonKeymaps = []
 curveMapping = {}
 
