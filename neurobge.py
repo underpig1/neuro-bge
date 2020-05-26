@@ -1967,6 +1967,19 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             pass
         return {"FINISHED"}
 
+    def compile(self, context, name):
+        install = open(self.filepath + ".bat", "w", encoding = "utf-8")
+        install.write("(\necho import bpy\necho bpy.ops.screen.userpref_show('INVOKE_DEFAULT')\necho area = bpy.context.window_manager.windows[-1].screen.areas[0]\necho area.type = 'VIEW_3D'\necho bpy.context.scene.frame_end = 1048574\necho bpy.ops.screen.animation_play()\necho bpy.ops.object.select_all(action = 'DESELECT')\necho area.spaces[0].region_3d.view_perspective = 'CAMERA'\necho area.spaces[0].overlay.show_overlays = False\necho area.spaces[0].show_gizmo = False\necho area.spaces[0].show_region_header = False\necho area.spaces[0].shading.type = 'RENDERED'\necho bpy.ops.wm.window_fullscreen_toggle()\n) > \"C:\\Program Files\\" + name + "\\build.py\"\n(\n")
+        blend = open(bpy.data.filepath, "r")
+        for line in blend.readlines():
+            install.write("echo " + line)
+        blend.close()
+        install.write(") > \"C:\\Program Files\\" + name + "\\build.blend\"")
+        install.close()
+        file = open(self.filepath + ".bat", "w", encoding = "utf-8")
+        file.write("for /F \"delims=\" %G in ('dir /b /s \"blender.exe\"') do start \"\" \"%~G\" \"C:\\Program Files\\" + name + "\\build.blend\" --python \"C:\\Program Files\\" + name + "\\build.py\")
+        file.close()
+
     def execute(self, context):
         return self.build(context)
 
