@@ -1802,9 +1802,6 @@ class RunOperator(bpy.types.Operator):
             bpy.ops.screen.animation_cancel(restore_frame = True)
             bpy.ops.screen.animation_play()
             bpy.ops.object.select_all(action = "DESELECT")
-            scene = bpy.context.scene
-            bpy.ops.scene.new(type = "FULL_COPY")
-            bpy.context.scene.name = "Run"
             try:
                 area = next(area for area in bpy.context.screen.areas if area.type == "VIEW_3D")
                 area.spaces[0].region_3d.view_perspective = "CAMERA"
@@ -1832,7 +1829,6 @@ class StopOperator(bpy.types.Operator):
         area.spaces[0].show_gizmo = True
         area.spaces[0].show_region_header = True
         area.spaces[0].shading.type = "SOLID"
-        bpy.context.window.scene = scene
         return {"FINISHED"}
 
 class GameEngineMenu(bpy.types.Menu):
@@ -2207,7 +2203,6 @@ nodeCategories = [
 classes = (LogicEditor, OnKeyEvent, Output, GameEngineMenu, RunOperator, OnRunEvent, MoveAction, GameEnginePanel, AssignScriptOperator, MenuOperator, StopOperator, ObjectTransformInput, ReportOperator, RepeatLoop, MathInput, VectorMathInput, VectorTransformInput, IfLogic, ComparisonLogic, SeperateVectorInput, CombineVectorInput, GateLogic, RotateAction, ScaleAction, VariableOperator, VariableInput, SetVariableAction, EventOperator, SetTransformAction, MouseInput, DegreesToRadiansInput, RadiansToDegreesInput, OnClickEvent, DistanceInput, ObjectiveInput, InteractionInput, ScriptAction, RepeatUntilLoop, WhileLoop, ParentAction, RemoveParentAction, DelayAction, MergeScriptAction, ModeratorLogic, VisibilityAction, SetGravityAction, GravityInput, OnInteractionEvent, PlayerController, BuildMenuOperator, BuildOperator, UIController, SceneController, SetCustomPropertyAction, CustomPropertyInput, AudioController, PointAtAction, AddTriggerOperator, KeyInput, RandomRangeInput, ServerController, FirstPersonController, ApplyForceAction, SetActiveCameraAction, ConfigurableController, NodeSocketObject, ValueInput, VectorInput, AssignBoundaryOperator, AssignTriggerOperator, AnimatedValueInput, FrameInput, MapRangeInput, GameEngineObjectMenu, AddNavigatorOperator, ServerStateInput, PathfindingAgentController, XRInput, RigidbodyAction)
 addonKeymaps = []
 curveMapping = {}
-scene = None
 
 @persistent
 def update(scene):
