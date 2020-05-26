@@ -1465,7 +1465,7 @@ class PathfindingAgentController(ActionNode):
     def runScript(self):
         object = runScript(self)
         speed = 1 / self.inputs[0].default_value
-        optimization = self.inputs[1].default_value * 100
+        optimization = self.inputs[1].default_value
         objective = self["objective"]
         plane = bpy.data.objects[str(self.obj)]
         if int(self.type) == 1:
@@ -2144,7 +2144,6 @@ nodeCategories = [
         nodeitems_utils.NodeItem("FrameInput", label = "Frame"),
         nodeitems_utils.NodeItem("ServerStateInput", label = "Server State"),
         nodeitems_utils.NodeItem("XRInput", label = "XR"),
-        nodeitems_utils.NodeItem("XRInput", label = "XR"),
     ]),
     NodeCategory("OUTPUTNODES", "Output", items = [
         nodeitems_utils.NodeItem("Output", label = "Output"),
@@ -2163,6 +2162,7 @@ nodeCategories = [
         nodeitems_utils.NodeItem("PointAtAction", label = "Point At"),
         nodeitems_utils.NodeItem("ApplyForceAction", label = "Apply Force"),
         nodeitems_utils.NodeItem("SetActiveCameraAction", label = "Set Active Camera"),
+        nodeitems_utils.NodeItem("RigidbodyAction", label = "Rigidbody"),
     ]),
     NodeCategory("LOOPNODES", "Logic", items = [
         nodeitems_utils.NodeItem("RepeatLoop", label = "Repeat"),
