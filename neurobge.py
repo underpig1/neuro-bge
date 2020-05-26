@@ -979,9 +979,9 @@ class VisibilityAction(ActionNode):
     def runScript(self):
         object = runScript(self)
         if self.inputs[0].default_value:
-            bpy.context.object.hide_viewport = False
+            object.hide_viewport = False
         else:
-            bpy.context.object.hide_viewport = True
+            object.hide_viewport = True
 
 class SetGravityAction(ActionNode):
     bl_idname = "SetGravityAction"
@@ -1094,7 +1094,6 @@ class RigidbodyAction(ActionNode):
 
     def runScript(self):
         object = runScript(self)
-        bpy.ops.rigidbody.world_add()
         if self.inputs[0].default_value:
             bpy.context.scene.rigidbody_world.collection.objects.link(object)
         else:
