@@ -1948,6 +1948,7 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
 
     def build(self, context):
         if int(self.platform) == 1:
+            import os
             if int(self.standalone) == 1:
                 install = open(self.filepath + "Install.bat", "w")
                 install.write("@echo off\n(\necho import bpy\necho bpy.ops.screen.userpref_show('INVOKE_DEFAULT')\necho area = bpy.context.window_manager.windows[-1].screen.areas[0]\necho area.type = 'VIEW_3D'\necho bpy.context.scene.frame_end = 1048574\necho bpy.ops.screen.animation_play()\necho bpy.ops.object.select_all(action = 'DESELECT')\necho area.spaces[0].region_3d.view_perspective = 'CAMERA'\necho area.spaces[0].overlay.show_overlays = False\necho area.spaces[0].show_gizmo = False\necho area.spaces[0].show_region_header = False\necho area.spaces[0].shading.type = 'RENDERED'\necho bpy.ops.wm.window_fullscreen_toggle()\n) > \"C:\\Program Files\\" + self.name + "\\build.py\"\n(\n")
@@ -2117,7 +2118,7 @@ def curveData(name):
     return curveDataNodeTree()[curveMapping[name]]
 
 def buildExport(self, context):
-    self.layout.operator("BuildOperator", text = "Build Export")
+    self.layout.operator("wm.build", text = "Build Game (.exe/.bat/.app/.sh/.command)")
 
 def runScript(self, script = "Script"):
     for output in self.outputs:
