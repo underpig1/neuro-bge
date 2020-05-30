@@ -1949,22 +1949,19 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
     def build(self, context):
         if int(self.platform) == 1:
             import os
+            from shutil import copyfile
             if int(self.standalone) == 1:
-                install = open(self.filepath + "Install.bat", "w")
-                install.write("@echo off\n(\necho import bpy\necho bpy.ops.screen.userpref_show('INVOKE_DEFAULT')\necho area = bpy.context.window_manager.windows[-1].screen.areas[0]\necho area.type = 'VIEW_3D'\necho bpy.context.scene.frame_end = 1048574\necho bpy.ops.screen.animation_play()\necho bpy.ops.object.select_all(action = 'DESELECT')\necho area.spaces[0].region_3d.view_perspective = 'CAMERA'\necho area.spaces[0].overlay.show_overlays = False\necho area.spaces[0].show_gizmo = False\necho area.spaces[0].show_region_header = False\necho area.spaces[0].shading.type = 'RENDERED'\necho bpy.ops.wm.window_fullscreen_toggle()\n) > \"C:\\Program Files\\" + self.name + "\\build.py\"\n(\n")
-                blend = open(bpy.data.filepath, "rb")
-                for line in blend.readlines():
-                    install.write("echo " + line.decode())
-                blend.close()
-                install.write(") > \"C:\\Program Files\\" + self.name + "\\build.blend\"")
-                install.write("\n(\necho for /F \"delims=\" %G in ('dir /b /s \"blender.exe\"') do start \"\" \"%~G\" \"C:\\Program Files\\" + self.name + "\\build.blend\" --python \"C:\\Program Files\\" + self.name + "\n) > " + self.name + ".bat\n")
-                install.write("\nset target=\"" + self.name + ".exe\"\nset name=\"" + self.name + "\"\nset dir=\"" + self.name + ".bat\"\nset sed=%temp%\2exe.sed\ncopy /y \"%~f0\" \"%sed%\" >nul\n(\necho\necho AppLaunched=cmd /c \"%name%\"\necho TargetName=\"%target%\"\necho FILE0=\"%name%\"\necho [SourceFiles]\necho SourceFiles0=\"%dir%\"\necho [SourceFiles0]\necho %%FILE0%%=\n)>>\"%sed%\"\niexpress /n /q /m %sed%\ndel /q /f \"%sed%\"\nexit /b 0\n\n[Version]\nClass=IEXPRESS\nSEDVersion=3\n[Options]\nPackagePurpose=InstallApp\nShowInstallProgramWindow=0\nHideExtractAnimation=1\nUseLongFileName=1\nInsideCompressed=0\nCAB_FixedSize=0\nCAB_ResvCodeSigning=0\nRebootMode=N\nInstallPrompt=%InstallPrompt%\nDisplayLicense=%DisplayLicense%\nFinishMessage=%FinishMessage%\nTargetName=%TargetName%\nFriendlyName=%FriendlyName%\nAppLaunched=%AppLaunched%\nPostInstallCmd=%PostInstallCmd%\nAdminQuietInstCmd=%AdminQuietInstCmd%\nUserQuietInstCmd=%UserQuietInstCmd%\nSourceFiles=SourceFiles\n[Strings]\nInstallPrompt=\nDisplayLicense=\nFinishMessage=\nFriendlyName=\nPostInstallCmd=<None>\nAdminQuietInstCmd=")
-                install.close()
+                file = open(self.filepath + ".bat", "w")
+                bpy.ops.wm.save_as_mainfile(filepath = os.path.dirname(self.filepath) + "\\build.blend")
+                copyfile(os.path.dirname(os.path.realpath(__file__)) + "\\build.py", os.path.dirname(self.filepath) + "\\build.py")
+                file.write("@echo off\nfor /r C:\ %%a in (*) do if \"%%~nxa\"==\"blender.exe\" start \"\" \"%%~dpnxa\" build.blend --python build.py")
+                os.system(os.path.dirname(os.path.realpath(__file__)) + "\\BAT_EXE.bat " + self.filepath + ".bat")
+                file.close()
             else:
                 file = open(self.filepath + ".bat", "w", encoding = "utf-8")
                 file.write("\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python \"" + bpy.utils.user_resource("SCRIPTS", "addons") + "\\neuro-bge-master\\build.py\"")
                 file.close()
-                os.system("\nset target=\"" + self.filepath + ".exe\"\nset name=\"" + self.filepath + "\"\nset dir=\"" + self.filepath + ".bat\"\nset sed=%temp%\2exe.sed\ncopy /y \"%~f0\" \"%sed%\" >nul\n(\necho\necho AppLaunched=cmd /c \"%name%\"\necho TargetName=\"%target%\"\necho FILE0=\"%name%\"\necho [SourceFiles]\necho SourceFiles0=\"%dir%\"\necho [SourceFiles0]\necho %%FILE0%%=\n)>>\"%sed%\"\niexpress /n /q /m %sed%\ndel /q /f \"%sed%\"\nexit /b 0\n\n[Version]\nClass=IEXPRESS\nSEDVersion=3\n[Options]\nPackagePurpose=InstallApp\nShowInstallProgramWindow=0\nHideExtractAnimation=1\nUseLongFileName=1\nInsideCompressed=0\nCAB_FixedSize=0\nCAB_ResvCodeSigning=0\nRebootMode=N\nInstallPrompt=%InstallPrompt%\nDisplayLicense=%DisplayLicense%\nFinishMessage=%FinishMessage%\nTargetName=%TargetName%\nFriendlyName=%FriendlyName%\nAppLaunched=%AppLaunched%\nPostInstallCmd=%PostInstallCmd%\nAdminQuietInstCmd=%AdminQuietInstCmd%\nUserQuietInstCmd=%UserQuietInstCmd%\nSourceFiles=SourceFiles\n[Strings]\nInstallPrompt=\nDisplayLicense=\nFinishMessage=\nFriendlyName=\nPostInstallCmd=<None>\nAdminQuietInstCmd=")
+                os.system("set target=\"" + self.filepath + ".exe\"\nset name=\"" + self.filepath + "\"\nset dir=\"" + self.filepath + ".bat\"\nset sed=%temp%\2exe.sed\ncopy /y \"%~f0\" \"%sed%\" >nul\n(\necho\necho AppLaunched=cmd /c \"%name%\"\necho TargetName=\"%target%\"\necho FILE0=\"%name%\"\necho [SourceFiles]\necho SourceFiles0=\"%dir%\"\necho [SourceFiles0]\necho %%FILE0%%=\n)>>\"%sed%\"\niexpress /n /q /m %sed%\ndel /q /f \"%sed%\"\nexit /b 0\n\n[Version]\nClass=IEXPRESS\nSEDVersion=3\n[Options]\nPackagePurpose=InstallApp\nShowInstallProgramWindow=0\nHideExtractAnimation=1\nUseLongFileName=1\nInsideCompressed=0\nCAB_FixedSize=0\nCAB_ResvCodeSigning=0\nRebootMode=N\nInstallPrompt=%InstallPrompt%\nDisplayLicense=%DisplayLicense%\nFinishMessage=%FinishMessage%\nTargetName=%TargetName%\nFriendlyName=%FriendlyName%\nAppLaunched=%AppLaunched%\nPostInstallCmd=%PostInstallCmd%\nAdminQuietInstCmd=%AdminQuietInstCmd%\nUserQuietInstCmd=%UserQuietInstCmd%\nSourceFiles=SourceFiles\n[Strings]\nInstallPrompt=\nDisplayLicense=\nFinishMessage=\nFriendlyName=\nPostInstallCmd=<None>\nAdminQuietInstCmd=")
         elif int(self.platform) == 2:
             import os
             file = open(self.filepath + ".command", "w", encoding = "utf-8")
