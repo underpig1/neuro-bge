@@ -1963,7 +1963,7 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
                 file = open(self.filepath + ".bat", "w", encoding = "utf-8")
                 file.write("\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python \"" + bpy.utils.user_resource("SCRIPTS", "addons") + "\\neuro-bge-master\\build.py\"")
                 file.close()
-                os.system("\nset target=\"" + self.filepath + ".exe\"\nset name=\"" + self.filepath + "\"\nset dir=\"" + self.filepath + ".bat\"\nset sed=%temp%\2exe.sed\ncopy /y \"%~f0\" \"%sed%\" >nul\n(\necho\necho AppLaunched=cmd /c \"%name%\"\necho TargetName=\"%target%\"\necho FILE0=\"%name%\"\necho [SourceFiles]\necho SourceFiles0=\"%dir%\"\necho [SourceFiles0]\necho %%FILE0%%=\n)>>\"%sed%\"\niexpress /n /q /m %sed%\ndel /q /f \"%sed%\"\nexit /b 0\n\n[Version]\nClass=IEXPRESS\nSEDVersion=3\n[Options]\nPackagePurpose=InstallApp\nShowInstallProgramWindow=0\nHideExtractAnimation=1\nUseLongFileName=1\nInsideCompressed=0\nCAB_FixedSize=0\nCAB_ResvCodeSigning=0\nRebootMode=N\nInstallPrompt=%InstallPrompt%\nDisplayLicense=%DisplayLicense%\nFinishMessage=%FinishMessage%\nTargetName=%TargetName%\nFriendlyName=%FriendlyName%\nAppLaunched=%AppLaunched%\nPostInstallCmd=%PostInstallCmd%\nAdminQuietInstCmd=%AdminQuietInstCmd%\nUserQuietInstCmd=%UserQuietInstCmd%\nSourceFiles=SourceFiles\n[Strings]\nInstallPrompt=\nDisplayLicense=\nFinishMessage=\nFriendlyName=\nPostInstallCmd=<None>\nAdminQuietInstCmd="
+                os.system("\nset target=\"" + self.filepath + ".exe\"\nset name=\"" + self.filepath + "\"\nset dir=\"" + self.filepath + ".bat\"\nset sed=%temp%\2exe.sed\ncopy /y \"%~f0\" \"%sed%\" >nul\n(\necho\necho AppLaunched=cmd /c \"%name%\"\necho TargetName=\"%target%\"\necho FILE0=\"%name%\"\necho [SourceFiles]\necho SourceFiles0=\"%dir%\"\necho [SourceFiles0]\necho %%FILE0%%=\n)>>\"%sed%\"\niexpress /n /q /m %sed%\ndel /q /f \"%sed%\"\nexit /b 0\n\n[Version]\nClass=IEXPRESS\nSEDVersion=3\n[Options]\nPackagePurpose=InstallApp\nShowInstallProgramWindow=0\nHideExtractAnimation=1\nUseLongFileName=1\nInsideCompressed=0\nCAB_FixedSize=0\nCAB_ResvCodeSigning=0\nRebootMode=N\nInstallPrompt=%InstallPrompt%\nDisplayLicense=%DisplayLicense%\nFinishMessage=%FinishMessage%\nTargetName=%TargetName%\nFriendlyName=%FriendlyName%\nAppLaunched=%AppLaunched%\nPostInstallCmd=%PostInstallCmd%\nAdminQuietInstCmd=%AdminQuietInstCmd%\nUserQuietInstCmd=%UserQuietInstCmd%\nSourceFiles=SourceFiles\n[Strings]\nInstallPrompt=\nDisplayLicense=\nFinishMessage=\nFriendlyName=\nPostInstallCmd=<None>\nAdminQuietInstCmd=")
         elif int(self.platform) == 2:
             import os
             file = open(self.filepath + ".command", "w", encoding = "utf-8")
@@ -2115,6 +2115,9 @@ def curveData(name):
         curve = curveDataNodeTree().new("ShaderNodeRGBCurve")
         curveMapping[name] = curve.name
     return curveDataNodeTree()[curveMapping[name]]
+
+def buildExport(self, context):
+    self.layout.operator("BuildOperator", text = "Build Export")
 
 def runScript(self, script = "Script"):
     for output in self.outputs:
@@ -2277,6 +2280,7 @@ def register():
     bpy.app.handlers.frame_change_pre.append(retrieveEvents)
     bpy.app.handlers.save_pre.append(storeData)
     bpy.types.VIEW3D_MT_add.append(gameEngineObject)
+    bpy.types.TOPBAR_MT_file_export.append(buildExport)
 
 def unregister():
     for cls in classes:
@@ -2291,6 +2295,7 @@ def unregister():
     bpy.app.handlers.frame_change_pre.clear()
     bpy.app.handlers.save_pre.clear()
     bpy.types.VIEW3D_MT_add.remove(addTrigger)
+    bpy.types.TOPBAR_MT_file_export.remove(buildExport)
 
 if __name__ == "__main__":
     try:
