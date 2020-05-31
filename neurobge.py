@@ -1943,25 +1943,17 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
         name = "Platform",
         items = (("1", "Windows", "Build for Windows"), ("2", "Mac OSX", "Build for Mac OSX"), ("3", "Linux", "Build for Linux"))
     )
-    standalone = bpy.props.BoolProperty(name = "Windows Standalone")
-    name = bpy.props.StringProperty(name = "Name")
 
     def build(self, context):
         if int(self.platform) == 1:
             import os
             from shutil import copyfile
-            if int(self.standalone) == 1:
-                file = open(self.filepath + ".bat", "w")
-                bpy.ops.wm.save_as_mainfile(filepath = os.path.dirname(self.filepath) + "\\build.blend")
-                copyfile(os.path.dirname(os.path.realpath(__file__)) + "\\build.py", os.path.dirname(self.filepath) + "\\build.py")
-                file.write("@echo off\nfor /r C:\ %%a in (*) do if \"%%~nxa\"==\"blender.exe\" start \"\" \"%%~dpnxa\" build.blend --python build.py")
-                os.system(os.path.dirname(os.path.realpath(__file__)) + "\\BAT_EXE.bat " + self.filepath + ".bat")
-                file.close()
-            else:
-                file = open(self.filepath + ".bat", "w", encoding = "utf-8")
-                file.write("\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python \"" + bpy.utils.user_resource("SCRIPTS", "addons") + "\\neuro-bge-master\\build.py\"")
-                file.close()
-                os.system("set target=\"" + self.filepath + ".exe\"\nset name=\"" + self.filepath + "\"\nset dir=\"" + self.filepath + ".bat\"\nset sed=%temp%\2exe.sed\ncopy /y \"%~f0\" \"%sed%\" >nul\n(\necho\necho AppLaunched=cmd /c \"%name%\"\necho TargetName=\"%target%\"\necho FILE0=\"%name%\"\necho [SourceFiles]\necho SourceFiles0=\"%dir%\"\necho [SourceFiles0]\necho %%FILE0%%=\n)>>\"%sed%\"\niexpress /n /q /m %sed%\ndel /q /f \"%sed%\"\nexit /b 0\n\n[Version]\nClass=IEXPRESS\nSEDVersion=3\n[Options]\nPackagePurpose=InstallApp\nShowInstallProgramWindow=0\nHideExtractAnimation=1\nUseLongFileName=1\nInsideCompressed=0\nCAB_FixedSize=0\nCAB_ResvCodeSigning=0\nRebootMode=N\nInstallPrompt=%InstallPrompt%\nDisplayLicense=%DisplayLicense%\nFinishMessage=%FinishMessage%\nTargetName=%TargetName%\nFriendlyName=%FriendlyName%\nAppLaunched=%AppLaunched%\nPostInstallCmd=%PostInstallCmd%\nAdminQuietInstCmd=%AdminQuietInstCmd%\nUserQuietInstCmd=%UserQuietInstCmd%\nSourceFiles=SourceFiles\n[Strings]\nInstallPrompt=\nDisplayLicense=\nFinishMessage=\nFriendlyName=\nPostInstallCmd=<None>\nAdminQuietInstCmd=")
+            file = open(self.filepath + ".bat", "w")
+            bpy.ops.wm.save_as_mainfile(filepath = os.path.dirname(self.filepath) + "\\build.blend")
+            copyfile(os.path.dirname(os.path.realpath(__file__)) + "\\build.py", os.path.dirname(self.filepath) + "\\build.py")
+            file.write("@echo off\nfor /r C:\ %%a in (*) do if \"%%~nxa\"==\"blender.exe\" start \"\" \"%%~dpnxa\" build.blend --python build.py")
+            os.system(os.path.dirname(os.path.realpath(__file__)) + "\\BAT_EXE.bat " + self.filepath + ".bat")
+            file.close()
         elif int(self.platform) == 2:
             import os
             file = open(self.filepath + ".command", "w", encoding = "utf-8")
