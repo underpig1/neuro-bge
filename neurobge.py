@@ -1950,16 +1950,17 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             from shutil import copyfile
             file = open(self.filepath + ".bat", "w")
             bpy.ops.wm.save_as_mainfile(filepath = os.path.dirname(self.filepath) + "\\build.blend")
-            copyfile(os.path.dirname(os.path.realpath(__file__)) + "\\build.py", os.path.dirname(self.filepath) + "\\build.py")
+            copyfile(os.path.dirname(os.path.realpath(__file__)) + "\\build\\build.py", os.path.dirname(self.filepath) + "\\build.py")
             file.write("@echo off\nfor /r C:\ %%a in (*) do if \"%%~nxa\"==\"blender.exe\" start \"\" \"%%~dpnxa\" build.blend --python build.py")
-            os.system(os.path.dirname(os.path.realpath(__file__)) + "\\BAT_EXE.bat " + self.filepath + ".bat")
+            os.system(os.path.dirname(os.path.realpath(__file__)) + "\\build\\BAT_EXE.bat " + self.filepath + ".bat")
             file.close()
         elif int(self.platform) == 2:
             import os
-            file = open(self.filepath + ".command", "w", encoding = "utf-8")
-            file.write("#!/bin/bash\n\"" + bpy.app.binary_path + "\" " + bpy.data.filepath + " --python \"" + bpy.utils.user_resource("SCRIPTS", "addons") + "\\neuro-bge-master\\build.py\"")
+            file = open(self.filepath + ".sh", "w", encoding = "utf-8")
+            file.write("#!/bin/bash\nfind ./ -type f -name \"blender.app\" -exec \"{}\" ../Resources/build.blend --python ../Resources/build.py \;")
             file.close()
-            os.system("chmod +x " + self.filepath + ".command")
+            os.system("chmod +x " + self.filepath + ".sh")
+            os.system(os.path.dirname(os.path.realpath(__file__)) + "/build/SH_APP.sh " + self.filepath + ".sh " + os.path.realpath(__file__)) + "/build/build.py " + bpy.data.filepath)
         elif int(self.platform) == 3:
             import os
             file = open(self.filepath + ".sh", "w", encoding = "utf-8")
