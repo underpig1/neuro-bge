@@ -12,7 +12,6 @@ Clone or [download](https://github.com/underpig1/neuro-bge/archive/master.zip) t
 - Scripting
 - Game engine
 - Build support on macOS, Windows, and Linux
-- Multiplayer support
 - Over fifty nodes to develop stable games
 
 ## Screenshots and Examples
