@@ -1,7 +1,7 @@
 bl_info = {
     "name": "NeuroBGE",
     "author": "Underpig",
-    "version": (1, 3, 0),
+    "version": (1, 0, 0),
     "blender": (2, 93, 0),
     "description": "Node-based game engine for Blender",
     "location": "Logic Editor > Game Engine",
