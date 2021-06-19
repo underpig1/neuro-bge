@@ -1949,20 +1949,25 @@ class BuildOperator(bpy.types.Operator, bpy_extras.io_utils.ExportHelper):
             import os
             import subprocess
             from shutil import copyfile
+            import time
             file = open(self.filepath + ".bat", "w")
             bpy.ops.wm.save_as_mainfile(filepath = os.path.dirname(self.filepath) + "\\build.blend")
             copyfile(os.path.dirname(os.path.realpath(__file__)) + "\\build\\build.py", os.path.dirname(self.filepath) + "\\build.py")
             file.write("@echo off\nfor /r C:\ %%a in (*) do if \"%%~nxa\"==\"blender.exe\" start \"\" \"%%~dpnxa\" build.blend --python build.py")
-            subprocess.call("\"" + os.path.dirname(os.path.realpath(__file__)) + "\\build\\BAT_EXE.bat\" \"" + self.filepath + ".bat\"")
             file.close()
+            time.sleep(1)
+            subprocess.Popen("\"" + os.path.dirname(os.path.realpath(__file__)) + "\\build\\BAT_EXE.bat\" \"" + self.filepath + ".bat\"")
+            os.remove(os.path.dirname(self.filepath) + "\\build.blend")
+            os.remove(os.path.dirname(self.filepath) + "\\build.py")
+            os.remove(self.filepath + ".bat")
         elif int(self.platform) == 2:
             import os
             import subprocess
             file = open("\"" + self.filepath + ".sh\"", "w", encoding = "utf-8")
             file.write("#!/bin/bash\nfind ./ -type f -name \"blender.app\" -exec \"{}\" ../Resources/build.blend --python ../Resources/build.py \;")
             file.close()
-            subprocess.call("chmod +x " + self.filepath + ".sh")
-            subprocess.call("\"" + os.path.dirname(os.path.realpath(__file__)) + "/build/SH_APP.sh\" \"" + self.filepath + ".sh\" \"" + os.path.dirname(os.path.realpath(__file__)) + "/build/build.py\" \"" + bpy.data.filepath + "\"")
+            subprocess.Popen("chmod +x " + self.filepath + ".sh", shell = True)
+            subprocess.Popen("\"" + os.path.dirname(os.path.realpath(__file__)) + "/build/SH_APP.sh\" \"" + self.filepath + ".sh\" \"" + os.path.dirname(os.path.realpath(__file__)) + "/build/build.py\" \"" + bpy.data.filepath + "\"", shell = True)
         elif int(self.platform) == 3:
             import os
             file = open(self.filepath + ".sh", "w", encoding = "utf-8")

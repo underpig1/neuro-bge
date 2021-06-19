@@ -34,12 +34,12 @@ set sed=%temp%\2exe.sed
    echo PostInstallCmd=^<None^>
    echo AdminQuietInstCmd=
    echo AppLaunched=cmd /c "%name%"
-   echo TargetName="%target%"
+   echo TargetName=%target%
    echo FILE0="%name%"
    echo FILE1="build.py"
    echo FILE2="build.blend"
    echo [SourceFiles]
-   echo SourceFiles0="%dir%"
+   echo SourceFiles0=%dir%
    echo [SourceFiles0]
    echo %%FILE0%%=
    echo %%FILE1%%=
